@@ -1,9 +1,11 @@
 Package: cfbscrapR
 Title: What the Package Does (one line, title case)
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: c(person("Meyappan", "Subbaiah", email = "meysubb@gmail.com", role = c("aut", "cre")),
+             person("Michael", "Ellison", email = "mrellison42@gmail.com", role = c("aut ","cre"))
+Description: CFB related
 Depends: R (>= 3.5.3)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+gm
