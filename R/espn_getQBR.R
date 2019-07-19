@@ -7,6 +7,9 @@
 #' @param yr Year of the requested rankings
 #' @return A data frame of the requested rankings
 #' @import magrittr
+#' @import rvest
+#' @import janitor
+#' @import dplyr
 #' @export
 #' @examples
 #' # Capture QBR single game rankings for 2013
@@ -22,23 +25,44 @@ espn_getQBR <- function(x = c('player-season', 'player-week','team-season',
   espn <- 'http://espn.go.com/ncf/qbr/_/type/'
 
   if(is.null(wk)){
-    url = paste0(espn, x, '/qualified/', tolower(qlf), '/year/', yr)
+    url = paste0(espn, x, '/year/', yr)
     pages = xml2::read_html(url) %>% html_nodes(".page-numbers") %>% html_text()
-    pages =
+    pages = as.numeric(stringr::str_extract_all(pages,"\\(?[0-9.]+\\)?")[[1]])
+    max_page = max(pages)
     df <- url %>%
       XML::readHTMLTable(as.data.frame = TRUE,
                          stringsAsFactors = FALSE) %>%
       .[[1]] %>%
       .[.[1] != 'RK', ]
+    for(i in seq(2,max_page)){
+        url2 = paste0(url,"/page/",i)
+        temp_df <- url2 %>% XML::readHTMLTable(as.data.frame = TRUE,
+                                               stringsAsFactors = FALSE) %>%
+          .[[1]] %>%
+          .[.[1] != 'RK',]
+        df = rbind(df,temp_df)
+    }
+
   }
   if(!is.null(wk)){
     espn <- 'http://www.espn.com/college-football/qbr/_'
-    url <= paste0(espn, '/qualified/', tolower(qlf), '/year/', yr,'/seasontype/2/type/player-week/week/',wk)
+    url <- paste0(espn, '/year/', yr,'/seasontype/2/type/player-week/week/',wk)
+    pages = xml2::read_html(url) %>% html_nodes(".page-numbers") %>% html_text()
+    pages = as.numeric(stringr::str_extract_all(pages,"\\(?[0-9.]+\\)?")[[1]])
+    max_page = max(pages)
     df <- url %>%
       XML::readHTMLTable(as.data.frame = TRUE,
                          stringsAsFactors = FALSE) %>%
       .[[1]] %>%
       .[.[1] != 'RK', ]
+    for(i in seq(2,max_page)){
+      url2 = paste0(url,"/page/",i)
+      temp_df <- url2 %>% XML::readHTMLTable(as.data.frame = TRUE,
+                                             stringsAsFactors = FALSE) %>%
+        .[[1]] %>%
+        .[.[1] != 'RK',]
+      df = rbind(df,temp_df)
+    }
   }
 
 
