@@ -3,6 +3,7 @@
 #' Data comes from https://api.collegefootballdata.com
 #'
 #' Extracts raw game by game data.
+#' @param season_type Select Season Type (regular,postseason,both)
 #' @param year Select year, (example: 2018)
 #' @param week Select week, this is optional (also numeric)
 #' @param team Select team name (example: Texas, Texas A&M, Clemson)
@@ -15,6 +16,7 @@
 #'
 
 cfb_pbp_data <- function(year,
+                         season_type = 'regular',
                          week = 1,
                          team = NULL,
                          play_type = NULL,
@@ -36,10 +38,10 @@ cfb_pbp_data <- function(year,
   ## Inputs
   ## Year, Week, Team
   if(is.null(drive)){
-    play_base_url <- "https://api.collegefootballdata.com/plays?"
+    play_base_url <- paste0("https://api.collegefootballdata.com/plays?seasonType=",season_type,'&')
   }
   else{
-    play_base_url <- "https://api.collegefootballdata.com/drives?"
+    play_base_url <- paste0("https://api.collegefootballdata.com/drives?seasonType=",season_type,'&')
   }
 
   if (is.null(play_type) & is.null(team)) {

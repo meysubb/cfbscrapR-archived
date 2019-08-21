@@ -6,11 +6,13 @@
 This is only for D1 football
 Data comes from https://api.collegefootballdata.com}
 \usage{
-cfb_pbp_data(year, week = 1, team = NULL, play_type = NULL,
-  drive = NULL)
+cfb_pbp_data(year, season_type = "regular", week = 1, team = NULL,
+  play_type = NULL, drive = NULL)
 }
 \arguments{
 \item{year}{Select year, (example: 2018)}
+
+\item{season_type}{Select Season Type (regular,postseason,both)}
 
 \item{week}{Select week, this is optional (also numeric)}
 
