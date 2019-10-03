@@ -4,7 +4,7 @@
 #' 3 - Game info for one team that year (or a specific week)
 #' 4 - Game info for specific conference that year (or a specific week)
 #'
-#' Extracts team talent rankings as sourced from 247 rankings
+#' #' @param season_type Select Season Type (regular,postseason,both)
 #' @param year Year
 #' @param week Week (optional, keep this numeric)
 #' @param team Team (optional, D1 Team)
@@ -24,6 +24,7 @@
 #'
 
 cfb_game_info <- function(year,
+                          season_type = 'regular',
                           week = NULL,
                           team = NULL,
                           conference = NULL) {
@@ -35,8 +36,7 @@ cfb_game_info <- function(year,
   options(stringsAsFactors = FALSE)
   play_base_url <-
     paste0("https://api.collegefootballdata.com/games?year=",
-           year,
-           "&")
+           year,"&seasonType=",season_type,"&")
   if(!is.null(team)){
     team = URLencode(team, reserved = T)
   }
