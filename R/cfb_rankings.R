@@ -1,0 +1,29 @@
+#' Gets CFB rankings at a specific week
+#'
+#' Postseason polls are after Week 13
+#'
+#' @param year Year
+#' @param week Week
+#'
+#'#' @keywords internal
+#' @importFrom jsonlite "fromJSON"
+#' @importFrom purrr "flatten"
+#' @importFrom tidyr "unnest"
+#' @import dplyr
+#' @export
+#' @examples
+#'
+#' cfb_play_stats_player(401110723)
+
+
+
+cfb_rankings <- function(year,week){
+  base_url = url = "https://api.collegefootballdata.com/rankings?year="
+
+  url = paste0(base_url,year,"&week=",week)
+
+  raw_lst = fromJSON(url) %>% purrr::flatten()
+
+  polls_info = raw_lst$polls %>% tidyr::unnest() %>%
+    group_by(poll) %>% arrange(rank,.by_group=TRUE) %>% ungroup()
+}
