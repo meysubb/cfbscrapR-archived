@@ -13,7 +13,9 @@
 #' @export
 #' @examples
 #'
-#' cfb_play_stats_player(401110723)
+#' cfb_rankings(2018,1)
+#'
+#' cfb_rankings(2018,14)
 
 
 
