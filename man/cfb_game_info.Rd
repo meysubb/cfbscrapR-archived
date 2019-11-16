@@ -8,7 +8,8 @@
 3 - Game info for one team that year (or a specific week)
 4 - Game info for specific conference that year (or a specific week)}
 \usage{
-cfb_game_info(year, week = NULL, team = NULL, conference = NULL)
+cfb_game_info(year, season_type = "regular", week = NULL,
+  team = NULL, conference = NULL)
 }
 \arguments{
 \item{year}{Year}
@@ -20,7 +21,7 @@ cfb_game_info(year, week = NULL, team = NULL, conference = NULL)
 \item{conference}{Conference (option, select an appropriate conference)}
 }
 \description{
-Extracts team talent rankings as sourced from 247 rankings
+#' @param season_type Select Season Type (regular,postseason,both)
 }
 \examples{
 
