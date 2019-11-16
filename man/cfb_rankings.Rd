@@ -2,7 +2,7 @@
 % Please edit documentation in R/cfb_rankings.R
 \name{cfb_rankings}
 \alias{cfb_rankings}
-\title{Gets CFB rankings at a specific week}
+\title{Gets Historical CFB poll rankings at a specific week}
 \usage{
 cfb_rankings(year, week)
 }

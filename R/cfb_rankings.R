@@ -1,4 +1,4 @@
-#' Gets CFB rankings at a specific week
+#' Gets Historical CFB poll rankings at a specific week
 #'
 #' Postseason polls are after Week 13
 #'

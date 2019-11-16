@@ -6,7 +6,7 @@
 #'
 #' @param year Year
 #' @param team Team information (optional)
-#' @param year2 Year 2 (End Year) - if looking for position group info
+#' @param year2 Year 2 (End Year) - For position group information
 #'
 #' @keywords internal
 #' @importFrom jsonlite "fromJSON"

@@ -11,7 +11,7 @@ cfb_recruiting(year, team = NULL, year2 = NULL)
 
 \item{team}{Team information (optional)}
 
-\item{year2}{Year 2 (End Year) - if looking for position group info}
+\item{year2}{Year 2 (End Year) - For position group information}
 }
 \description{
 If two years are provided, get cfb recruiting information based on position groups during that
