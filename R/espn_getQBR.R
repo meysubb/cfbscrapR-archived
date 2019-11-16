@@ -13,7 +13,7 @@
 #' @export
 #' @examples
 #' # Capture QBR single game rankings for 2013
-#' getQBR('player-game', yr = 2013)
+#' espn_getQBR('player-game', yr = 2013)
 espn_getQBR <- function(x = c('player-season', 'player-week','team-season',
                               'alltime-season','alltime-game'),
                    qlf = TRUE,

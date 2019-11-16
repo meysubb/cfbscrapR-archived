@@ -19,6 +19,9 @@ espn_getFPI <- function(yr = format(Sys.Date(), '%Y'), wk = NULL) {
 
   df <-
     paste0(url, '/key/', weekKey(wk, url)) %>%
+    httr::GET(.)
+
+  df = rawToChar(df$content) %>%
     XML::readHTMLTable(as.data.frame = TRUE,
                        stringsAsFactors = FALSE) %>%
     .[[1]] %>%
