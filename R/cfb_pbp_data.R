@@ -91,5 +91,38 @@ cfb_pbp_data <- function(year,
   raw_play_df <- do.call(data.frame, raw_play_df)
   play_df <- raw_play_df
 
+  ## call/drive information
+  if(is.null(drive)){
+    drive_info = cfb_pbp_data(year,season_type = season_type,team=team,week=week,drive=TRUE)
+    clean_drive_df = clean_drive_info(drive_info)
+    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id")
+  }
   return(play_df)
 }
+
+
+clean_drive_info <- function(drive_df){
+  clean_drive = drive_df %>% mutate(
+    pts_drive = case_when(
+      str_detect(drive_result,"TD") ~ 7,
+      #str_detect(drive_result,"FG") ~ 3,
+      str_detect(drive_result,"SF") ~ -2,
+      drive_result == 'FG GOOD' ~ 3,
+      drive_result == 'FG' ~ 3,
+      drive_result == 'MISSED FG TD' ~ -7,
+      drive_result == 'KICKOFF RETURN TD' ~ -7,
+      drive_result == 'END OF HALF TD' ~ 7,
+      drive_result == "END OF GAME TD" ~ 7,
+      drive_result == 'PUNT RETURN TD' ~ -7,
+      drive_result == 'PUNT TD' ~ -7,
+      drive_result == 'INT TD' ~ -7,
+      drive_result == 'INT RETURN TOUCH' ~ -7,
+      drive_result == 'FUMBLE RETURN TD' ~ -7,
+      drive_result == 'FUMBLE TD' ~ -7,
+      drive_result == 'DOWNS TD' ~ -7,
+      TRUE ~ 0),
+    scoring = ifelse(pts_drive!=0,TRUE,scoring)
+  ) %>% mutate(drive_id = as.numeric(id)) %>% arrange(game_id,drive_id)
+  return(clean_drive)
+}
+
