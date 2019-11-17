@@ -19,11 +19,11 @@
 #'
 
 plot_pbp_sequencing <- function(df){
-  clean_game_df = prep_df_pbp_overview(df)
+  clean_game_df = prep_df_pbp_overview(df) %>% filter(!stringr::str_detect(play_type,"End"))
   clean_game_df$new_drive_id = as.numeric(gsub(unique(clean_game_df$game_id), "", clean_game_df$drive_id))
 
   clean_drive_info = clean_game_df %>% group_by(drive_id) %>%
-    filter(row_number() == (n()-1)) %>% ungroup() %>%
+    filter(row_number() == (n())) %>% ungroup() %>%
     mutate(
       y_max = max(play_num) + 5,
       score_text = ifelse(scoring == TRUE, score_text, NA)
@@ -82,7 +82,7 @@ plot_pbp_sequencing <- function(df){
 }
 
 prep_df_pbp_overview <- function(df) {
-  clean_df = df %>%
+  clean_df = df %>% arrange(id.x) %>%
     mutate(
       event = case_when(
         str_detect(play_text, "fumble") ~ "Fumble",
@@ -100,8 +100,9 @@ prep_df_pbp_overview <- function(df) {
         str_detect(play_type, "Penalty") ~ "Penalty",
         TRUE ~ "Other"
       ),
+      drive_id = cumsum(offense.x!=lead(offense.x)),
       score_text = paste0(offense_score, "-", defense_score)
-    ) %>% group_by(drive_id) %>%
+    ) %>% group_by(drive_id) %>%  arrange(id.x) %>%
     mutate(play_num = row_number())  %>% ungroup()
 
 }
