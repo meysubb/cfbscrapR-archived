@@ -114,9 +114,7 @@ cfb_pbp_data <- function(year,
         -end_time.seconds,
         -elapsed.seconds,
         -elapsed.minutes,
-        -plays,
-        -start_time.hours,
-        -end_time.hours
+        -plays
       )
     if(epa_wpa){
       play_df = calculate_epa(play_df)
