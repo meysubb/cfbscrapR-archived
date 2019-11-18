@@ -20,7 +20,8 @@ cfb_pbp_data <- function(year,
                          week = 1,
                          team = NULL,
                          play_type = NULL,
-                         drive=NULL) {
+                         drive=NULL,
+                         epa_wpa=FALSE) {
   #require(jsonlite)
   options(stringsAsFactors = FALSE)
   if (!is.null(play_type)) {
@@ -95,7 +96,17 @@ cfb_pbp_data <- function(year,
   if(is.null(drive)){
     drive_info = cfb_pbp_data(year,season_type = season_type,team=team,week=week,drive=TRUE)
     clean_drive_df = clean_drive_info(drive_info)
-    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id")
+    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id",suffix=c("_play","_drive")) %>%
+      select(
+        -offense_drive,
+        -offense_conference_drive,
+        -defense_drive,
+        -defense_conference_drive,
+        -id_drive
+      )
+    if(epa_wpa){
+      play_df = calculate_epa(play_df)
+    }
   }
   return(play_df)
 }

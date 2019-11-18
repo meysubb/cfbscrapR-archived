@@ -1,5 +1,22 @@
+#' Add EPA calculations
+#' This is only for D1 football
+#'
+#'
+#' Extracts raw game by game data.
+#' @param clean_pbp_dat Clean PBP DataFrame (as pulled from cfb_pbp_dat)
+#' @param ep_model EP Model
+#' @param fg_model FG Model
+#' @keywords internal
+#' @import mgcv
+#' @import nnet
+#' @import stringr
+#' @import dplyr
+#' @import tidyr
+#' @export
+#' @examples
+#'
 
-calculate_epa <- function(clean_pbp_dat, ep_mod, fg_mod) {
+calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model=cfbscrapR:::fg_model) {
   # constant vectors to be used again
   turnover_play_type = c(
     'Fumble Recovery (Opponent)',
@@ -34,9 +51,13 @@ calculate_epa <- function(clean_pbp_dat, ep_mod, fg_mod) {
     "Pass Interception Return Touchdown",
     "Kickoff Touchdown"
   )
+  clean_pbp_dat = prep_pbp_df(clean_pbp_dat)
 
-
-  pred_df = clean_pbp_dat %>% select(TimeSecsRem,
+  pred_df = clean_pbp_dat %>% arrange(id_play) %>% select(
+                                     id_play,
+                                     drive_id,
+                                     game_id,
+                                     TimeSecsRem,
                                      down,
                                      distance,
                                      adj_yd_line,
@@ -45,10 +66,11 @@ calculate_epa <- function(clean_pbp_dat, ep_mod, fg_mod) {
                                      Goal_To_Go)
 
   # ep_start
-  ep_start = as.data.frame(predict(ep_mod, pred_df, type = 'prob'))
+  ep_start = as.data.frame(predict(ep_model, pred_df, type = 'prob'))
+  colnames(ep_start) <- ep_model$lev
   ep_start_update = epa_fg_probs(dat = clean_pbp_dat,
                                  current_probs = ep_start,
-                                 fg_mod = fg_mod)
+                                 fg_model = fg_model)
   weights = c(0, 3, -3, -2, -7, 2, 7)
   pred_df$ep_before = apply(ep_start_update, 1, function(row) {
     sum(row * weights)
@@ -68,24 +90,27 @@ calculate_epa <- function(clean_pbp_dat, ep_mod, fg_mod) {
   }
 
   ep_end = predict(ep_model, prep_df_after, type = 'prob')
+  colnames(ep_end) <- ep_model$lev
   pred_df$ep_after = apply(ep_end, 1, function(row) {
     sum(row * weights)
   })
 
-  colnames(prep_df_after) = paste0(colnames(prep_df_after), "_end")
-  pred_df = cbind(clean_pbp_dat, prep_df_after, pred_df[, c("ep_before", "ep_after")])
+  colnames(prep_df_after)[4:12] = paste0(colnames(prep_df_after)[4:12], "_end")
+  pred_df = clean_pbp_dat %>% left_join(prep_df_after) %>% left_join(pred_df %>% select(id_play, drive_id, game_id, ep_before, ep_after))
   #pred_df$turnover = turnover_col
-
   ## kickoff plays
-  pred_df[(pred_df$play_type =='Kickoff'),"ep_after"] = pred_df[(pred_df$play_type =='Kickoff'),"ep_before"]
   ## calculate EP before at kickoff as what happens if it was a touchback
   ## 25 yard line in 2012 and onwards
-  pred_df[(pred_df$play_type =='Kickoff'),"adj_yd_line"] = 80
-  pred_df[(pred_df$play_type =='Kickoff'),"log_ydstogo"] = log(80)
-  ep_kickoffs = as.data.frame(predict(ep_mod, pred_df[(pred_df$play_type =='Kickoff'),], type = 'prob'))
-  pred_df[(pred_df$play_type =='Kickoff'),"ep_before"] = ep_kickoffs
+  kickoff_ind = (pred_df$play_type =='Kickoff')
+  new_kick = pred_df[kickoff_ind,]
+  new_kick["adj_yd_line"] = 75
+  new_kick["log_ydstogo"] = log(75)
+  ep_kickoffs = as.data.frame(predict(ep_model, new_kick, type = 'prob'))
+  pred_df[(pred_df$play_type =='Kickoff'),"ep_before"] = apply(ep_kickoffs,1,function(row){
+    sum(row*weights)
+  })
 
-  turnover_plays = which(pred_df$turnover_end == 1)
+  turnover_plays = which(pred_df$turnover_end == 1 & !kickoff_ind)
   pred_df[turnover_plays, "ep_after"] = -1 * pred_df[turnover_plays, "ep_after"]
 
   # game end EP is 0
@@ -103,21 +128,16 @@ calculate_epa <- function(clean_pbp_dat, ep_mod, fg_mod) {
     mutate(EPA = ep_after - ep_before) %>%
     select(-yard_line,
            -coef,
-           -coef2,
-           -log_ydstogo_end,-Goal_To_Go_end,
-           -home_team) %>% select(
-             year,
-             week,
+           -log_ydstogo_end,-Goal_To_Go_end) %>% select(
              game_id,
              drive_id,
-             id,
-             offense,
-             offense_conference,
-             defense,
-             defense_conference,
+             id_play,
+             offense_play,
+             offense_conference_play,
+             defense_play,
+             defense_conference_play,
              home,
              away,
-             neutral_site,
              period,
              half,
              clock.minutes,
@@ -206,7 +226,7 @@ prep_pbp_df <- function(df){
       clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
       Under_two = raw_secs <= 120,
-      coef = home == defense.x,
+      coef = home == defense_play,
       half = ifelse(period <= 2, 1, 2),
       adj_yd_line = 100 * (1 - coef) + (2 * coef - 1) * yard_line,
       log_ydstogo = log(adj_yd_line)
@@ -238,7 +258,7 @@ prep_pbp_df <- function(df){
   return(df)
 }
 
-epa_fg_probs <- function(dat, current_probs, fg_mod) {
+epa_fg_probs <- function(dat, current_probs, fg_model) {
   fg_ind = str_detect((dat$play_type), "Field Goal")
   fg_dat = dat[fg_ind, ]
 
@@ -247,7 +267,7 @@ epa_fg_probs <- function(dat, current_probs, fg_mod) {
   end_game_ind = which(dat$TimeSecsRem <= 0)
   current_probs[end_game_ind, ] <- 0
 
-  make_fg_prob <- mgcv::predict.bam(fg_mod, newdata = fg_dat,
+  make_fg_prob <- mgcv::predict.bam(fg_model, newdata = fg_dat,
                                     type = "response")
 
   # add in the fg make prob into this
@@ -287,10 +307,12 @@ prep_df_epa2 <- function(dat){
     'Punt'
   )
 
+
   dat = dat %>%
     mutate_at(vars(clock.minutes, clock.seconds), ~ replace_na(., 0)) %>%
     mutate(
-      id = as.numeric(id),
+      new_id = gsub(pattern=unique(game_id),"",x=id_play),
+      new_id = as.numeric(new_id),
       clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
       log_ydstogo = log(adj_yd_line),
@@ -303,7 +325,7 @@ prep_df_epa2 <- function(dat){
   turnover_ind = dat$play_type %in% turnover_play_type
   dat$turnover = 0
 
-  new_offense = !(dat$offense == lead(dat$offense))
+  new_offense = !(dat$offense_play == lead(dat$offense_play))
   #fourth_down = dat$down == 4,  & fourth_down
   t_ind = turnover_ind | (new_offense)
 
@@ -312,7 +334,7 @@ prep_df_epa2 <- function(dat){
 
 
   dat = dat %>% group_by(game_id,half) %>%
-    dplyr::arrange(id,.by_group=TRUE) %>%
+    dplyr::arrange(new_id,.by_group=TRUE) %>%
     mutate(
       new_down = lead(down),
       new_distance = lead(distance),
@@ -340,6 +362,9 @@ prep_df_epa2 <- function(dat){
   dat$new_log_ydstogo[missing_yd_line] = log(99)
 
   dat = dat %>% select(
+    id_play,
+    game_id,
+    drive_id,
     new_TimeSecsRem,
     new_down,
     new_distance,
@@ -351,7 +376,7 @@ prep_df_epa2 <- function(dat){
     turnover
   )
   colnames(dat) = gsub("new_","",colnames(dat))
-  colnames(dat)[4] <- "adj_yd_line"
+  colnames(dat)[7] <- "adj_yd_line"
 
   return(dat)
 }

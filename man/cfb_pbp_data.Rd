@@ -7,7 +7,7 @@ This is only for D1 football
 Data comes from https://api.collegefootballdata.com}
 \usage{
 cfb_pbp_data(year, season_type = "regular", week = 1, team = NULL,
-  play_type = NULL, drive = NULL)
+  play_type = NULL, drive = NULL, epa_wpa = FALSE)
 }
 \arguments{
 \item{year}{Select year, (example: 2018)}
