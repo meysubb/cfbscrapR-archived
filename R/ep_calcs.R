@@ -77,7 +77,9 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   })
 
   ## Prep for EP_after
-  prep_df_after = prep_df_epa2(clean_pbp_dat)
+  if(length(unique(clean_pbp_dat$game_id))==1){
+    prep_df_after = prep_df_epa2(clean_pbp_dat)
+  }
   if (length(unique(clean_pbp_dat$game_id)) > 1) {
     # if you are trying to deal with multiple games at once
     # then you have to get the after individually.
@@ -102,13 +104,16 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   ## calculate EP before at kickoff as what happens if it was a touchback
   ## 25 yard line in 2012 and onwards
   kickoff_ind = (pred_df$play_type =='Kickoff')
-  new_kick = pred_df[kickoff_ind,]
-  new_kick["adj_yd_line"] = 75
-  new_kick["log_ydstogo"] = log(75)
-  ep_kickoffs = as.data.frame(predict(ep_model, new_kick, type = 'prob'))
-  pred_df[(pred_df$play_type =='Kickoff'),"ep_before"] = apply(ep_kickoffs,1,function(row){
-    sum(row*weights)
-  })
+  if(any(kickoff_ind)){
+    new_kick = pred_df[kickoff_ind,]
+    new_kick["adj_yd_line"] = 75
+    new_kick["log_ydstogo"] = log(75)
+    ep_kickoffs = as.data.frame(predict(ep_model, new_kick, type = 'prob'))
+    pred_df[(pred_df$play_type =='Kickoff'),"ep_before"] = apply(ep_kickoffs,1,function(row){
+      sum(row*weights)
+    })
+  }
+
 
   turnover_plays = which(pred_df$turnover_end == 1 & !kickoff_ind)
   pred_df[turnover_plays, "ep_after"] = -1 * pred_df[turnover_plays, "ep_after"]
@@ -227,7 +232,7 @@ prep_pbp_df <- function(df){
       raw_secs = clock.minutes * 60 + clock.seconds,
       Under_two = raw_secs <= 120,
       coef = home == defense_play,
-      coef2 = home_team == offense,
+      coef2 = home == offense_play,
       half = ifelse(period <= 2, 1, 2),
       adj_yd_line = 100 * (1 - coef) + (2 * coef - 1) * yard_line,
       log_ydstogo = log(adj_yd_line)
