@@ -85,9 +85,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   ep_start_update = epa_fg_probs(dat = clean_pbp_dat,
                                  current_probs = ep_start,
                                  fg_model = fg_model)
-  colnames(ep_start_update) = make.names(colnames(ep_start_update))
   weights = c(0, 3, -3, -2, -7, 2, 7)
-  pred_df$ep_before = apply(ep_start, 1, function(row) {
+  pred_df$ep_before = apply(ep_start_update, 1, function(row) {
     sum(row * weights)
   })
 
