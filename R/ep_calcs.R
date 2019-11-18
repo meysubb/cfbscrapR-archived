@@ -51,10 +51,23 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     "Pass Interception Return Touchdown",
     "Kickoff Touchdown"
   )
-  clean_pbp_dat = prep_pbp_df(clean_pbp_dat)
+  if(length(unique(clean_pbp_dat$game_id))==1){
+    clean_pbp_dat = prep_pbp_df(clean_pbp_dat)
+  }
+  if (length(unique(clean_pbp_dat$game_id)) > 1) {
+    # if you are trying to deal with multiple games at once
+    # then you have to get the after individually.
+    clean_pbp_dat = purrr::map_dfr(unique(clean_pbp_dat$game_id),
+                                   function(x) {
+                                     clean_pbp_dat %>%
+                                       filter(game_id == x) %>%
+                                       prep_pbp_df()
+                                   })
+  }
+
 
   pred_df = clean_pbp_dat %>% arrange(id_play) %>% select(
-                                     id_play,
+                                     new_id,
                                      drive_id,
                                      game_id,
                                      TimeSecsRem,
@@ -66,13 +79,15 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
                                      Goal_To_Go)
 
   # ep_start
+
   ep_start = as.data.frame(predict(ep_model, pred_df, type = 'prob'))
   colnames(ep_start) <- ep_model$lev
   ep_start_update = epa_fg_probs(dat = clean_pbp_dat,
                                  current_probs = ep_start,
                                  fg_model = fg_model)
+  colnames(ep_start_update) = make.names(colnames(ep_start_update))
   weights = c(0, 3, -3, -2, -7, 2, 7)
-  pred_df$ep_before = apply(ep_start_update, 1, function(row) {
+  pred_df$ep_before = apply(ep_start, 1, function(row) {
     sum(row * weights)
   })
 
@@ -92,17 +107,17 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   }
 
   ep_end = predict(ep_model, prep_df_after, type = 'prob')
-  colnames(ep_end) <- ep_model$lev
+  colnames(ep_end) <- cnames
   pred_df$ep_after = apply(ep_end, 1, function(row) {
     sum(row * weights)
   })
 
   colnames(prep_df_after)[4:12] = paste0(colnames(prep_df_after)[4:12], "_end")
-  ## need to fix the join here,
-  ## it is causing lots of duplications
-  ## tese with this game in 2015 - 400787359
-  pred_df2 = clean_pbp_dat %>% left_join(prep_df_after,by=c("game_id","new_id")) %>%
-    left_join(pred_df %>% select(id_play, drive_id, game_id, ep_before, ep_after))
+  pred_df = clean_pbp_dat %>% left_join(prep_df_after,
+                                        by = c("game_id","drive_id" = "drive_id_end", "new_id")) %>%
+   left_join(pred_df %>% select(new_id, drive_id, game_id, ep_before, ep_after),
+             by = c("game_id","drive_id", "new_id"))
+
   #pred_df$turnover = turnover_col
   ## kickoff plays
   ## calculate EP before at kickoff as what happens if it was a touchback
@@ -110,16 +125,18 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   kickoff_ind = (pred_df$play_type =='Kickoff')
   if(any(kickoff_ind)){
     new_kick = pred_df[kickoff_ind,]
+    new_kick["down"] = 1
+    new_kick["distance"] = 10
     new_kick["adj_yd_line"] = 75
     new_kick["log_ydstogo"] = log(75)
     ep_kickoffs = as.data.frame(predict(ep_model, new_kick, type = 'prob'))
-    pred_df[(pred_df$play_type =='Kickoff'),"ep_before"] = apply(ep_kickoffs,1,function(row){
+    pred_df[kickoff_ind,"ep_before"] = apply(ep_kickoffs,1,function(row){
       sum(row*weights)
     })
   }
 
 
-  turnover_plays = which(pred_df$turnover_end == 1 & !kickoff_ind)
+  turnover_plays = which(pred_df$turnover == 1 & !kickoff_ind)
   pred_df[turnover_plays, "ep_after"] = -1 * pred_df[turnover_plays, "ep_after"]
 
   # game end EP is 0
@@ -141,7 +158,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
            -log_ydstogo_end,-Goal_To_Go_end) %>% select(
              game_id,
              drive_id,
-             id_play,
+             id_play.x,
              offense_play,
              defense_play,
              home,
@@ -164,7 +181,6 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              down_end,
              distance_end,
              adj_yd_line_end,
-             turnover_end,
              Under_two_end,
              everything()
            )
