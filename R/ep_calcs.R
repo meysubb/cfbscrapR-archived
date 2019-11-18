@@ -227,6 +227,7 @@ prep_pbp_df <- function(df){
       raw_secs = clock.minutes * 60 + clock.seconds,
       Under_two = raw_secs <= 120,
       coef = home == defense_play,
+      coef2 = home_team == offense,
       half = ifelse(period <= 2, 1, 2),
       adj_yd_line = 100 * (1 - coef) + (2 * coef - 1) * yard_line,
       log_ydstogo = log(adj_yd_line)
