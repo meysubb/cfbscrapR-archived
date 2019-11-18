@@ -6,7 +6,7 @@
 This is only for D1 football}
 \usage{
 calculate_epa(clean_pbp_dat, ep_model = cfbscrapR:::ep_model,
-  fg_model = cfbscrapR:::fg_model)
+  fg_model = cfbscrapR:::fg_model, extra_cols = F)
 }
 \arguments{
 \item{clean_pbp_dat}{Clean PBP DataFrame (as pulled from cfb_pbp_dat)}

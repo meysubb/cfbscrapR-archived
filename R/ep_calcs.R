@@ -16,7 +16,7 @@
 #' @examples
 #'
 
-calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model=cfbscrapR:::fg_model) {
+calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model=cfbscrapR:::fg_model,extra_cols=F) {
   # constant vectors to be used again
   turnover_play_type = c(
     'Fumble Recovery (Opponent)',
@@ -83,7 +83,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   if (length(unique(clean_pbp_dat$game_id)) > 1) {
     # if you are trying to deal with multiple games at once
     # then you have to get the after individually.
-    prep_df_after = map_dfr(unique(clean_pbp_dat$game_id),
+    prep_df_after = purrr::map_dfr(unique(clean_pbp_dat$game_id),
                             function(x) {
                               clean_pbp_dat %>%
                                 filter(game_id == x) %>%
@@ -98,7 +98,11 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   })
 
   colnames(prep_df_after)[4:12] = paste0(colnames(prep_df_after)[4:12], "_end")
-  pred_df = clean_pbp_dat %>% left_join(prep_df_after) %>% left_join(pred_df %>% select(id_play, drive_id, game_id, ep_before, ep_after))
+  ## need to fix the join here,
+  ## it is causing lots of duplications
+  ## tese with this game in 2015 - 400787359
+  pred_df2 = clean_pbp_dat %>% left_join(prep_df_after,by=c("game_id","new_id")) %>%
+    left_join(pred_df %>% select(id_play, drive_id, game_id, ep_before, ep_after))
   #pred_df$turnover = turnover_col
   ## kickoff plays
   ## calculate EP before at kickoff as what happens if it was a touchback
@@ -133,14 +137,13 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     mutate(EPA = ep_after - ep_before) %>%
     select(-yard_line,
            -coef,
+           -coef2,
            -log_ydstogo_end,-Goal_To_Go_end) %>% select(
              game_id,
              drive_id,
              id_play,
              offense_play,
-             offense_conference_play,
              defense_play,
-             defense_conference_play,
              home,
              away,
              period,
@@ -164,63 +167,67 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              turnover_end,
              Under_two_end,
              everything()
-           ) %>%
-    mutate(
-      rz_play = ifelse((adj_yd_line <= 20), 1, 0),
-      scoring_opp = ifelse((adj_yd_line <= 40), 1, 0),
-      pass = if_else(
-        play_type == "Pass Reception" | play_type == "Passing Touchdown" |
-          play_type == "Sack" |
-          play_type == "Pass Interception Return" |
-          play_type == "Pass Incompletion" |
-          play_type == "Sack Touchdown" |
-          (play_type == "Safety" &
-             str_detect(play_text, "sacked")) |
-          (
-            play_type == "Fumble Recovery (Own)" &
-              str_detect(play_text, "pass")
-          ) |
-          (
-            play_type == "Fumble Recovery (Opponent)" &
-              str_detect(play_text, "pass")
-          ),
-        1,
-        0
-      ),
-      rush = ifelse(
-        play_type == "Rush" |
-          (play_type == "Safety" &
-             str_detect(play_text, "run")) |
-          (
-            play_type == "Fumble Recovery (Opponent)" &
-              str_detect(play_text, "run")
-          ) |
-          (
-            play_type == "Fumble Recovery (Own)" &
-              str_detect(play_text, "run")
-          ),
-        1,
-        0
-      ),
-      stuffed_run = ifelse((rush == 1 &
-                              yards_gained <= 0), 1, 0),
-      success = ifelse(
-        yards_gained >= .5 * distance & down == 1,
-        1,
-        ifelse(
-          yards_gained >= .7 * distance & down == 2,
+           )
+  if(extra_cols){
+    pred_df = pred_df %>%
+      mutate(
+        rz_play = ifelse((adj_yd_line <= 20), 1, 0),
+        scoring_opp = ifelse((adj_yd_line <= 40), 1, 0),
+        pass = if_else(
+          play_type == "Pass Reception" | play_type == "Passing Touchdown" |
+            play_type == "Sack" |
+            play_type == "Pass Interception Return" |
+            play_type == "Pass Incompletion" |
+            play_type == "Sack Touchdown" |
+            (play_type == "Safety" &
+               str_detect(play_text, "sacked")) |
+            (
+              play_type == "Fumble Recovery (Own)" &
+                str_detect(play_text, "pass")
+            ) |
+            (
+              play_type == "Fumble Recovery (Opponent)" &
+                str_detect(play_text, "pass")
+            ),
+          1,
+          0
+        ),
+        rush = ifelse(
+          play_type == "Rush" |
+            (play_type == "Safety" &
+               str_detect(play_text, "run")) |
+            (
+              play_type == "Fumble Recovery (Opponent)" &
+                str_detect(play_text, "run")
+            ) |
+            (
+              play_type == "Fumble Recovery (Own)" &
+                str_detect(play_text, "run")
+            ),
+          1,
+          0
+        ),
+        stuffed_run = ifelse((rush == 1 &
+                                yards_gained <= 0), 1, 0),
+        success = ifelse(
+          yards_gained >= .5 * distance & down == 1,
           1,
           ifelse(
-            yards_gained >= distance & down == 3,
+            yards_gained >= .7 * distance & down == 2,
             1,
-            ifelse(yards_gained >= distance &
-                     down == 4, 1, 0)
+            ifelse(
+              yards_gained >= distance & down == 3,
+              1,
+              ifelse(yards_gained >= distance &
+                       down == 4, 1, 0)
+            )
           )
-        )
-      ),
-      success = ifelse(play_type %in% turnover_play_type, 0, success),
-      epa_success = ifelse(EPA > 0, 1, 0)
-    )
+        ),
+        success = ifelse(play_type %in% turnover_play_type, 0, success),
+        epa_success = ifelse(EPA > 0, 1, 0)
+      )
+  }
+
   return(pred_df)
 }
 
@@ -234,13 +241,15 @@ prep_pbp_df <- function(df){
       coef = home == defense_play,
       coef2 = home == offense_play,
       half = ifelse(period <= 2, 1, 2),
+      new_id = gsub(pattern=unique(game_id),"",x=id_play),
+      new_id = as.numeric(new_id),
       adj_yd_line = 100 * (1 - coef) + (2 * coef - 1) * yard_line,
       log_ydstogo = log(adj_yd_line)
     ) %>% filter(period <= 4, down > 0) %>%
     filter(!is.na(down), !is.na(raw_secs)) %>% rename(TimeSecsRem = raw_secs)
 
-  bool_chk = df$year == 2019 & df$offense %in% c("Alabama","Duke") & df$defense %in% c("Alabama","Duke")
-  bool_chk2 = df$year == 2019 & df$offense %in% c("Florida","Miami") & df$defense %in% c("Florida","Miami")
+  bool_chk = df$year == 2019 & df$offense_play %in% c("Alabama","Duke") & df$defense_play %in% c("Alabama","Duke")
+  bool_chk2 = df$year == 2019 & df$offense_play %in% c("Florida","Miami") & df$defense_play %in% c("Florida","Miami")
   bool_chk = bool_chk | bool_chk2
   if(length(bool_chk)>0){
     df$adj_yd_line[bool_chk] = 100 * (1-df$coef2[bool_chk]) + (2*df$coef2[bool_chk] - 1)*df$yard_line[bool_chk]
@@ -369,6 +378,7 @@ prep_df_epa2 <- function(dat){
 
   dat = dat %>% select(
     id_play,
+    new_id,
     game_id,
     drive_id,
     new_TimeSecsRem,
@@ -382,7 +392,8 @@ prep_df_epa2 <- function(dat){
     turnover
   )
   colnames(dat) = gsub("new_","",colnames(dat))
-  colnames(dat)[7] <- "adj_yd_line"
+  colnames(dat)[8] <- "adj_yd_line"
+  colnames(dat)[2] <- "new_id"
 
   return(dat)
 }

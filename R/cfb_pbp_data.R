@@ -98,11 +98,25 @@ cfb_pbp_data <- function(year,
     clean_drive_df = clean_drive_info(drive_info)
     play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id",suffix=c("_play","_drive")) %>%
       select(
+        -offense_conference_play,
+        -defense_conference_play,
         -offense_drive,
         -offense_conference_drive,
         -defense_drive,
         -defense_conference_drive,
-        -id_drive
+        -id_drive,
+        -start_time.minutes,
+        -start_time.seconds,
+        -start_period,
+        -end_period,
+        -end_yardline,
+        -end_time.minutes,
+        -end_time.seconds,
+        -elapsed.seconds,
+        -elapsed.minutes,
+        -plays,
+        -start_time.hours,
+        -end_time.hours
       )
     if(epa_wpa){
       play_df = calculate_epa(play_df)
