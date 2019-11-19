@@ -30,7 +30,7 @@ plot_pbp_sequencing <- function(df){
     )
 
   nd_id = clean_drive_info$new_drive_id
-  off_team = clean_drive_info$offense.x
+  off_team = clean_drive_info$offense_play
 
   ggplot() +
     geom_tile(
@@ -82,7 +82,7 @@ plot_pbp_sequencing <- function(df){
 }
 
 prep_df_pbp_overview <- function(df) {
-  clean_df = df %>% arrange(id.x) %>%
+  clean_df = df %>% arrange(id_play) %>%
     mutate(
       event = case_when(
         str_detect(play_text, "fumble") ~ "Fumble",
@@ -100,9 +100,9 @@ prep_df_pbp_overview <- function(df) {
         str_detect(play_type, "Penalty") ~ "Penalty",
         TRUE ~ "Other"
       ),
-      drive_id = cumsum(offense.x!=lead(offense.x)),
+      drive_id = cumsum(offense_play!=lead(offense_play)),
       score_text = paste0(offense_score, "-", defense_score)
-    ) %>% group_by(drive_id) %>%  arrange(id.x) %>%
+    ) %>% group_by(drive_id) %>%  arrange(id_play) %>%
     mutate(play_num = row_number())  %>% ungroup()
 
 }
