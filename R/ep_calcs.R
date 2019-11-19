@@ -16,7 +16,7 @@
 #' @examples
 #'
 
-calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model=cfbscrapR:::fg_model,extra_cols=F) {
+calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model=cfbscrapR:::fg_model) {
   # constant vectors to be used again
   turnover_play_type = c(
     'Fumble Recovery (Opponent)',
@@ -57,7 +57,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   if (length(unique(clean_pbp_dat$game_id)) > 1) {
     # if you are trying to deal with multiple games at once
     # then you have to get the after individually.
-    clean_pbp_dat = purrr::map_dfr(unique(clean_pbp_dat$game_id),
+    g_ids = sort(unique(clean_pbp_dat$game_id))
+    clean_pbp_dat = purrr::map_dfr(g_ids,
                                    function(x) {
                                      clean_pbp_dat %>%
                                        filter(game_id == x) %>%
@@ -97,7 +98,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   if (length(unique(clean_pbp_dat$game_id)) > 1) {
     # if you are trying to deal with multiple games at once
     # then you have to get the after individually.
-    prep_df_after = purrr::map_dfr(unique(clean_pbp_dat$game_id),
+    g_ids = sort(unique(clean_pbp_dat$game_id))
+    prep_df_after = purrr::map_dfr(g_ids,
                             function(x) {
                               clean_pbp_dat %>%
                                 filter(game_id == x) %>%
@@ -106,7 +108,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   }
 
   ep_end = predict(ep_model, prep_df_after, type = 'prob')
-  colnames(ep_end) <- cnames
+  colnames(ep_end) <- ep_model$lev
   pred_df$ep_after = apply(ep_end, 1, function(row) {
     sum(row * weights)
   })
@@ -150,13 +152,24 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
 
 
   pred_df = pred_df %>%
-    mutate(EPA = ep_after - ep_before) %>%
+    mutate(EPA = ep_after - ep_before,
+           # prep some variables for WPA
+           score_diff = offense_score - defense_score,
+           home_EPA = ifelse(offense_play==home,EPA,-EPA),
+           away_EPA = -home_EPA,
+           ExpScoreDiff = score_diff + ep_before,
+           half = as.factor(half),
+           ExpScoreDiff_Time_Ratio = ExpScoreDiff/ (TimeSecsRem + 1)) %>%
     select(-yard_line,
            -coef,
            -coef2,
-           -log_ydstogo_end,-Goal_To_Go_end) %>% select(
+           -log_ydstogo,-log_ydstogo_end,
+           -Goal_To_Go_end,-end_half_game_end,
+           #-start_time.hours,-end_time.hours,
+           -id_play.y,-Under_two_end) %>% select(
              game_id,
              drive_id,
+             new_id,
              id_play.x,
              offense_play,
              defense_play,
@@ -172,7 +185,9 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              play_text,
              scoring,
              TimeSecsRem,
+             Under_two,
              down,
+             Goal_To_Go,
              distance,
              adj_yd_line,
              yards_gained,
@@ -180,11 +195,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              down_end,
              distance_end,
              adj_yd_line_end,
-             Under_two_end,
              everything()
-           )
-  if(extra_cols){
-    pred_df = pred_df %>%
+           ) %>%
       mutate(
         rz_play = ifelse((adj_yd_line <= 20), 1, 0),
         scoring_opp = ifelse((adj_yd_line <= 40), 1, 0),
@@ -241,7 +253,6 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
         success = ifelse(play_type %in% turnover_play_type, 0, success),
         epa_success = ifelse(EPA > 0, 1, 0)
       )
-  }
 
   return(pred_df)
 }
