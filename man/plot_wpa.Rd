@@ -16,9 +16,10 @@ Plot the WPA for a specific game
 
 
 
-df = cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 
-plot_wpa(df,away_color="",home_color="",)
-
+df = cfb_pbp_data(year=2019,week=12,team='Baylor',epa_wpa = T)
+home_color <- c(BU="#003015")
+away_color <- c(OU="#841617")
+plot_wpa(df,away_color,home_color,winner="away")
 }
 \keyword{internal}
