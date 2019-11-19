@@ -8,6 +8,7 @@
 #' @import ggplot2
 #' @import stringr
 #' @import ggrepel
+#' @import tidyr
 #' @export
 #' @examples
 #'
