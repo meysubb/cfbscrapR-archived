@@ -8,4 +8,15 @@ Depends: R (>= 3.5.3)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    dplyr,
+    ggplot2,
+    ggrepel,
+    tidyr,
+    stringr,
+    nnet,
+    mgcv,
+    assertthat,
+    jsonlite,
+    purrr
 RoxygenNote: 6.1.1.9000
