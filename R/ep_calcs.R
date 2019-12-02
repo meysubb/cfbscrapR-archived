@@ -295,7 +295,7 @@ prep_pbp_df <- function(df){
     str_detect(play_type, "Field Goal"),
     distance >= (adj_yd_line - 17),
     distance >= adj_yd_line
-  )) %>% filter(log_ydstogo != -Inf)
+  )) %>% filter(log_ydstogo != -Inf) %>% arrange(new_id)
   return(df)
 }
 
@@ -416,7 +416,7 @@ prep_df_epa2 <- function(dat){
     new_Under_two,
     end_half_game,
     turnover
-  )
+  ) %>% arrange(new_id)
   colnames(dat) = gsub("new_","",colnames(dat))
   colnames(dat)[8] <- "adj_yd_line"
   colnames(dat)[2] <- "new_id"
