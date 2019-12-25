@@ -90,6 +90,11 @@ cfb_pbp_data <- function(year,
 
   raw_play_df <- fromJSON(full_url)
   raw_play_df <- do.call(data.frame, raw_play_df)
+  if(nrow(raw_play_df)==0){
+    warning("Most likely a bye week, the data pulled from the API was empty. Returning nothing
+            for this one week or team.")
+    return(NULL)
+  }
   play_df <- raw_play_df
 
   ## call/drive information
