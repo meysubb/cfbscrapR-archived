@@ -101,25 +101,16 @@ cfb_pbp_data <- function(year,
   if(is.null(drive)){
     drive_info = cfb_pbp_data(year,season_type = season_type,team=team,week=week,drive=TRUE)
     clean_drive_df = clean_drive_info(drive_info)
-    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id",suffix=c("_play","_drive")) %>%
+    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id",suffix=c("_play","_drive"))
+    rm_cols = c('offense_conference_play','defense_conference_play','offense_drive','offense_conference_drive',
+      'defense_drive','defense_conference_drive','id_drive','start_time.minutes',
+      'start_time.seconds','start_period','end_period','end_yardline',
+      'end_time.minutes','end_time.seconds','elapsed.seconds','elapsed.minutes',
+      'plays'
+    )
+    play_df = play_df %>%
       select(
-        -offense_conference_play,
-        -defense_conference_play,
-        -offense_drive,
-        -offense_conference_drive,
-        -defense_drive,
-        -defense_conference_drive,
-        -id_drive,
-        -start_time.minutes,
-        -start_time.seconds,
-        -start_period,
-        -end_period,
-        -end_yardline,
-        -end_time.minutes,
-        -end_time.seconds,
-        -elapsed.seconds,
-        -elapsed.minutes,
-        -plays
+        setdiff(names(.), rm_cols)
       )
     if(epa_wpa){
       play_df = calculate_epa(play_df)
