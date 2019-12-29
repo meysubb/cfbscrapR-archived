@@ -1,6 +1,6 @@
 Package: cfbscrapR
 Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(person("Meyappan", "Subbaiah", email = "meysubb@gmail.com", role = c("aut", "cre")),
              person("Michael", "Ellison", email = "mrellison42@gmail.com", role = c("ctb")))
 Description: CFB related
