@@ -28,8 +28,10 @@ cfb_sp_ranking <- function(year=NULL,team=NULL,conference=NULL){
   if(is.null(conference)){
     base_url = "https://api.collegefootballdata.com/ratings/sp"
     full_url = paste0(base_url,"?year=",year)
-    team = URLencode(team, reserved = T)
-    full_url = paste0(full_url,'&team=',team)
+    if (!is.null(team)){
+      team = URLencode(team, reserved = T)
+      full_url = paste0(full_url,'&team=',team)
+    }
     df = fromJSON(full_url)
     return(df)
   }
