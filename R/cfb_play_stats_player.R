@@ -22,6 +22,10 @@ cfb_play_stats_player <- function(gameId){
   play_base_url <- "https://api.collegefootballdata.com/play/stats?gameId="
   url = paste0(play_base_url,gameId)
   raw_df = fromJSON(url)
+  if(length(raw_df)==0){
+    warning(paste0('There is no data in the underlying API call ',url))
+    return(NA)
+  }
 
   clean_df = pivot_wider(raw_df, names_from = statType, values_from = athleteName) %>%
     group_by(playId) %>%
