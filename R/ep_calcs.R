@@ -220,7 +220,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
           0
         ),
         rush = ifelse(
-          play_type == "Rush" |
+          play_type == "Rush" | play_type == "Rushing Touchdown" |
             (play_type == "Safety" &
                str_detect(play_text, "run")) |
             (
