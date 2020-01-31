@@ -131,9 +131,15 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     new_kick["adj_yd_line"] = 75
     new_kick["log_ydstogo"] = log(75)
     ep_kickoffs = as.data.frame(predict(ep_model, new_kick, type = 'prob'))
-    pred_df[kickoff_ind,"ep_before"] = apply(ep_kickoffs,1,function(row){
-      sum(row*weights)
-    })
+    if(table(kickoff_ind)[2] > 1){
+      pred_df[kickoff_ind,"ep_before"] = apply(ep_kickoffs,1,function(row){
+        sum(row*weights)
+      })
+    }
+    else{
+      pred_df[kickoff_ind,"ep_before"] = sum(ep_kickoffs * weights)
+    }
+
   }
 
 
