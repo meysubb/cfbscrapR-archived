@@ -11,6 +11,7 @@
 #'#' @keywords internal
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom tidyr "pivot_wider"
+#' @importFrom tidyr "unite"
 #' @import dplyr
 #' @export
 #' @examples
@@ -26,11 +27,12 @@ cfb_play_stats_player <- function(gameId){
     warning(paste0('There is no data in the underlying API call ',url))
     return(NA)
   }
-
+  raw_df = raw_df[!duplicated(raw_df),]
   clean_df = pivot_wider(raw_df, names_from = statType, values_from = athleteName) %>%
     group_by(playId) %>%
     summarise_all(funs(first(na.omit(.)))) %>%
-    ungroup() %>% select(-athleteId,-stat)
+    ungroup() %>% select(-athleteId,-stat) %>%
+    unite("Passer",Incompletion:Completion,remove=T,na.rm=T)
 
   return(clean_df)
 }
