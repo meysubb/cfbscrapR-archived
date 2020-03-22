@@ -67,17 +67,19 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   }
 
 
-  pred_df = clean_pbp_dat %>% arrange(id_play) %>% select(
-                                     new_id,
-                                     drive_id,
-                                     game_id,
-                                     TimeSecsRem,
-                                     down,
-                                     distance,
-                                     adj_yd_line,
-                                     log_ydstogo,
-                                     Under_two,
-                                     Goal_To_Go)
+  pred_df = clean_pbp_dat %>% group_by(drive_id) %>% arrange(new_id, .by_group =
+                                                               T) %>% select(
+                                                                 new_id,
+                                                                 drive_id,
+                                                                 game_id,
+                                                                 TimeSecsRem,
+                                                                 down,
+                                                                 distance,
+                                                                 adj_yd_line,
+                                                                 log_ydstogo,
+                                                                 Under_two,
+                                                                 Goal_To_Go
+                                                               ) %>% ungroup()
 
   # ep_start
 
@@ -301,7 +303,7 @@ prep_pbp_df <- function(df){
     str_detect(play_type, "Field Goal"),
     distance >= (adj_yd_line - 17),
     distance >= adj_yd_line
-  )) %>% filter(log_ydstogo != -Inf) %>% arrange(new_id)
+  )) %>% filter(log_ydstogo != -Inf) %>% group_by(drive_id) %>%  arrange(new_id,.by_group=T) %>% ungroup()
   return(df)
 }
 
@@ -392,7 +394,7 @@ prep_df_epa2 <- function(dat){
       # new under two minute warnings
       new_Under_two = new_TimeSecsRem <= 120,
       end_half_game=0) %>% ungroup() %>%
-    mutate_at(vars(new_TimeSecsRem), ~ replace_na(., 0))
+    mutate_at(vars(new_TimeSecsRem), ~ replace_na(., 0)) %>% ungroup()
 
   end_of_half_plays = is.na(dat$new_yardline) & (dat$new_TimeSecsRem==0)
   if(any(end_of_half_plays)){
