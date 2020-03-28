@@ -115,8 +115,8 @@ cfb_pbp_data <- function(year,
     if(epa_wpa){
       play_df = calculate_epa(play_df)
       play_df = create_wpa(play_df)
+      play_df = play_df %>% group_by(drive_id) %>% arrange(new_id,.by_group=T)
     }
-    play_df = play_df %>% group_by(drive_id) %>% arrange(new_id,.by_group=T)
   }
   return(play_df)
 }
