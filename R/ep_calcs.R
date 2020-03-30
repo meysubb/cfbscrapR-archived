@@ -429,7 +429,7 @@ prep_df_epa2 <- function(dat){
       # new under two minute warnings
       new_Under_two = new_TimeSecsRem <= 120,
       end_half_game=0)) %>% 
-    mutate_at(vars(new_TimeSecsRem), ~ replace_na(., 0)) %>% ungroup()
+    mutate_at(vars(new_TimeSecsRem), ~ replace_na(., 0) %>% ungroup()
   
   end_of_half_plays = is.na(dat$new_yardline) & (dat$new_TimeSecsRem==0)
   if(any(end_of_half_plays)){
