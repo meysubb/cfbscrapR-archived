@@ -425,7 +425,7 @@ prep_df_epa2 <- function(dat){
       
       new_TimeSecsRem = lead(TimeSecsRem),
       new_log_ydstogo = log(new_yardline),
-      new_Goal_To_Go = ifelse(new_yardline <= distance, 1, 0),
+      new_Goal_To_Go = ifelse(new_yardline <= new_distance, 1, 0),
       # new under two minute warnings
       new_Under_two = new_TimeSecsRem <= 120,
       end_half_game=0)) %>% 
