@@ -397,7 +397,7 @@ prep_df_epa2 <- function(dat){
       
       new_down = case_when(
         play_type %in% normalplay & yards_gained >= distance ~ 1,
-        play_type %in% normalplay & yards_gained < distance & down < 3 ~ down + 1,
+        play_type %in% normalplay & yards_gained < distance & down <= 3 ~ down + 1,
         play_type %in% normalplay & yards_gained < distance & down == 4 ~ 1,
         play_type %in% turnover ~ 1,
         play_type %in% defense_score ~ 1,
@@ -407,7 +407,7 @@ prep_df_epa2 <- function(dat){
       new_distance = case_when(
         play_type %in% normalplay & yards_gained >= distance & (yards_to_goal - yards_gained > 10) ~ 10,
         play_type %in% normalplay & yards_gained >= distance & (yards_to_goal  - yards_gained < 10) ~ adj_yd_line,
-        play_type %in% normalplay & yards_gained < distance & down < 3 ~ distance - yards_gained,
+        play_type %in% normalplay & yards_gained < distance & down <= 3 ~ distance - yards_gained,
         play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (yards_to_goal  - yards_gained) > 10) ~ 10,
         play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (yards_to_goal  - yards_gained) < 10) ~ 100-adj_yd_line,
         play_type %in% turnover & (100 - (yards_to_goal + yards_gained) > 10) ~ 10,
