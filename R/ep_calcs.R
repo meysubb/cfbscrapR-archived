@@ -405,13 +405,13 @@ prep_df_epa2 <- function(dat){
         play_type %in% kickoff ~ 1),
       
       new_distance = case_when(
-        play_type %in% normalplay & yards_gained >= distance & (adj_yd_line - yards_gained > 10) ~ 10,
-        play_type %in% normalplay & yards_gained >= distance & (adj_yd_line - yards_gained < 10) ~ adj_yd_line,
+        play_type %in% normalplay & yards_gained >= distance & (yards_to_goal - yards_gained > 10) ~ 10,
+        play_type %in% normalplay & yards_gained >= distance & (yards_to_goal  - yards_gained < 10) ~ adj_yd_line,
         play_type %in% normalplay & yards_gained < distance & down < 3 ~ distance - yards_gained,
-        play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (adj_yd_line - yards_gained) > 10) ~ 10,
-        play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (adj_yd_line - yards_gained) < 10) ~ 100-adj_yd_line,
-        play_type %in% turnover & (100 - (adj_yd_line + yards_gained) > 10) ~ 10,
-        play_type %in% turnover & (100 - (adj_yd_line + yards_gained) < 10) ~ 100-(adj_yd_line + yards_gained),
+        play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (yards_to_goal  - yards_gained) > 10) ~ 10,
+        play_type %in% normalplay & yards_gained < distance & down == 4 & (100 - (yards_to_goal  - yards_gained) < 10) ~ 100-adj_yd_line,
+        play_type %in% turnover & (100 - (yards_to_goal + yards_gained) > 10) ~ 10,
+        play_type %in% turnover & (100 - (yards_to_goal + yards_gained) < 10) ~ 100-(yards_to_goal  + yards_gained),
         play_type %in% defense_score ~ 0,
         play_type %in% score ~ 0,
         play_type %in% kickoff ~ 10),
@@ -421,7 +421,7 @@ prep_df_epa2 <- function(dat){
         play_type %in% score ~ 0,
         play_type %in% defense_score ~ 0,
         play_type %in% kickoff ~ start_yards_to_goal,
-        play_type %in% turnover ~ 100 - adj_yd_line + yards_gained),
+        play_type %in% turnover ~ 100 - yards_to_goal + yards_gained),
       
       new_TimeSecsRem = lead(TimeSecsRem),
       new_log_ydstogo = log(new_yardline),
