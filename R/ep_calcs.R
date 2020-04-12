@@ -75,7 +75,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
                                                                  TimeSecsRem,
                                                                  down,
                                                                  distance,
-                                                                 adj_yd_line,
+                                                                 yads_to_goal,
                                                                  log_ydstogo,
                                                                  Under_two,
                                                                  Goal_To_Go
@@ -197,7 +197,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              down,
              Goal_To_Go,
              distance,
-             adj_yd_line,
+             yards_to_goal,
              yards_gained,
              TimeSecsRem_end,
              down_end,
@@ -206,8 +206,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              everything()
            ) %>%
     mutate(
-      rz_play = ifelse((adj_yd_line <= 20), 1, 0),
-      scoring_opp = ifelse((adj_yd_line <= 40), 1, 0),
+      rz_play = ifelse((yards_to_goal <= 20), 1, 0),
+      scoring_opp = ifelse((yards_to_goal <= 40), 1, 0),
       pass = if_else(
         play_type == "Pass Reception" | play_type == "Passing Touchdown" |
           play_type == "Sack" |
@@ -364,7 +364,7 @@ prep_df_epa2 <- function(dat){
       new_id = as.numeric(new_id),
       clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
-      log_ydstogo = log(adj_yd_line),
+      log_ydstogo = log(distance),
       half = ifelse(period <= 2, 1, 2),
       new_yardline = 0,
       new_down = 0,
@@ -388,7 +388,7 @@ prep_df_epa2 <- function(dat){
   normalplay = c("Rush", "Pass Reception", "Pass Incompletion", "Sack", "Fumble Recovery (Own)")
   score = c("Passing Touchdown", "Rushing Touchdown", "Field Goal Good")
   kickoff = c("Kickoff", "Kickoff Return (Offense)", "Kickoff Return Touchdown")
-  dat = dat %>% group_by(game_id,half) %>%
+  dat = dat %>% group_by(game_id,half) %>% mutate(start_yards_to_goal = as.numeric(start_yards_to_goal), yards_gained = as.numeric(yards_gained)) %>%
     dplyr::arrange(new_id,.by_group=TRUE) %>%
    mutate(
       turnover_indicator = ifelse(play_type %in% defense_score | play_type %in% turnover | 
@@ -417,7 +417,7 @@ prep_df_epa2 <- function(dat){
         play_type %in% kickoff ~ 10),
       
       new_yardline = case_when(
-        play_type %in% normalplay ~ adj_yd_line - yards_gained,
+        play_type %in% normalplay ~ yards_to_goal - yards_gained,
         play_type %in% score ~ 0,
         play_type %in% defense_score ~ 0,
         play_type %in% kickoff ~ start_yards_to_goal,
