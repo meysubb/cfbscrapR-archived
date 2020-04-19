@@ -611,8 +611,8 @@ prep_df_epa2 <- function(dat) {
       end_half_game,
       turnover
     ) %>% arrange(id_play) %>%
-    mutate(id_play = as.numeric(id_play),
-           id_play = gsub(pattern = unique(game_id), "", x = id_play))
+    mutate(id_play = gsub(pattern = unique(game_id), "", x = id_play),
+           id_play = as.numeric(id_play))
   colnames(dat) = gsub("new_", "", colnames(dat))
   colnames(dat)[3] <- "new_id"
   dat = dat %>% rename("yards_to_goal"="yardline")
