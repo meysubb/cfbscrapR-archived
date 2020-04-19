@@ -76,19 +76,22 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
 
 
 
-  pred_df = clean_pbp_dat %>% group_by(drive_id) %>% arrange(new_id, .by_group =
-                                                               T) %>% select(
-                                                                 new_id,
-                                                                 drive_id,
-                                                                 game_id,
-                                                                 TimeSecsRem,
-                                                                 down,
-                                                                 distance,
-                                                                 yards_to_goal,
-                                                                 log_ydstogo,
-                                                                 Under_two,
-                                                                 Goal_To_Go
-                                                               ) %>% ungroup()
+  pred_df = clean_pbp_dat %>% group_by(drive_id) %>%
+    arrange(new_id, .by_group =
+              T) %>% select(
+                new_id,
+                drive_id,
+                game_id,
+                TimeSecsRem,
+                down,
+                distance,
+                yards_to_goal,
+                log_ydstogo,
+                Under_two,
+                Goal_To_Go
+              ) %>%
+    mutate(down = as.factor(down)) %>%
+    ungroup()
 
   # ep_start
 
