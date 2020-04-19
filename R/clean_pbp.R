@@ -48,7 +48,7 @@ clean_pbp_dat <- function(raw_df) {
 add_timeout_cols <- function(play_df) {
   pbp_df <- play_df %>%
     group_by(game_id, half) %>%
-    arrange(desc(year), id_play) %>%
+    arrange(id_play) %>%
     mutate(
       timeout_called = ifelse(play_type %in% c("Timeout"), 1, 0),
       timeout_team = ifelse(
