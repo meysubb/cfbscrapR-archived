@@ -22,7 +22,6 @@ cfb_pbp_data <- function(year,
                          play_type = NULL,
                          drive=NULL,
                          epa_wpa=FALSE) {
-  browser()
   #require(jsonlite)
   options(stringsAsFactors = FALSE)
   if (!is.null(play_type)) {
@@ -122,6 +121,7 @@ cfb_pbp_data <- function(year,
                                          filter(game_id == x) %>%
                                          add_timeout_cols()
                                      })
+      browser()
       play_df = calculate_epa(play_df)
       play_df = create_wpa(play_df)
       play_df = play_df %>% group_by(drive_id) %>% arrange(new_id,.by_group=T)

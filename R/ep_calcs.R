@@ -123,9 +123,9 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     sum(row * weights)
   })
 
-  colnames(prep_df_after)[4:12] = paste0(colnames(prep_df_after)[4:12], "_end")
+  colnames(prep_df_after)[4:11] = paste0(colnames(prep_df_after)[4:11], "_end")
   pred_df = clean_pbp_dat %>% left_join(prep_df_after,
-                                        by = c("game_id","drive_id" = "drive_id_end", "new_id")) %>%
+                                        by = c("game_id","drive_id", "new_id")) %>%
     left_join(pred_df %>% select(new_id, drive_id, game_id, ep_before, ep_after),
               by = c("game_id","drive_id", "new_id"))
 
@@ -136,7 +136,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   kickoff_ind = (pred_df$play_type =='Kickoff')
   if(any(kickoff_ind)){
     new_kick = pred_df[kickoff_ind,]
-    new_kick["down"] = 1
+    new_kick["down"] = as.factor(1)
     new_kick["distance"] = 10
     new_kick["yards_to_goal"] = 75
     new_kick["log_ydstogo"] = log(10)
@@ -610,9 +610,11 @@ prep_df_epa2 <- function(dat) {
       new_Under_two,
       end_half_game,
       turnover
-    ) %>% arrange(id_play)
+    ) %>% arrange(id_play) %>%
+    mutate(id_play = as.numeric(id_play),
+           id_play = gsub(pattern = unique(game_id), "", x = id_play))
   colnames(dat) = gsub("new_", "", colnames(dat))
-  colnames(dat)[2] <- "new_id_play"
+  colnames(dat)[3] <- "new_id"
   dat = dat %>% rename("yards_to_goal"="yardline")
 
 
