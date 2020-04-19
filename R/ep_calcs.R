@@ -75,7 +75,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
                                                                  TimeSecsRem,
                                                                  down,
                                                                  distance,
-                                                                 yads_to_goal,
+                                                                 yards_to_goal,
                                                                  log_ydstogo,
                                                                  Under_two,
                                                                  Goal_To_Go
