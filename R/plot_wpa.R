@@ -58,10 +58,10 @@ plot_wpa <- function(dat,game_id=NULL,away_color,home_color,winner="home"){
     annotate("text", x = 3000, y = 0.1,
              label = paste(" @",home_team), color = home_color, size=8) +
     scale_y_continuous(limits=c(0,1)) +
-    geom_vline(xintercept = 900, linetype = "dashed", black) +
-    geom_vline(xintercept = 1800, linetype = "dashed", black) +
-    geom_vline(xintercept = 2700, linetype = "dashed", black) +
-    geom_vline(xintercept = 0, linetype = "dashed", black) +
+    geom_vline(xintercept = 900, linetype = "dashed", color= "black") +
+    geom_vline(xintercept = 1800, linetype = "dashed",color= "black") +
+    geom_vline(xintercept = 2700, linetype = "dashed", color= "black") +
+    geom_vline(xintercept = 0, linetype = "dashed", color= "black") +
     labs(
       x = "Time Remaining (seconds)",
       y = "Win Probability",

@@ -14,11 +14,18 @@
 #'
 
 create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
-  col_nec = c("ExpScoreDiff", "TimeSecsRem", "half", "Under_two")
+  col_nec = c(
+    "ExpScoreDiff",
+    "TimeSecsRem",
+    "half",
+    "Under_two",
+    "off_timeouts_rem_before",
+    "def_timeouts_rem_before"
+  )
   if (!all(col_nec %in% colnames(df))) {
     df = df %>% mutate(
       score_diff = offense_score - defense_score,
-      home_EPA = ifelse(offense_play == home, EPA, -EPA),
+      home_EPA = ifelse(offense_play == home, EPA,-EPA),
       away_EPA = -home_EPA,
       ExpScoreDiff = score_diff + ep_before,
       half = as.factor(half),

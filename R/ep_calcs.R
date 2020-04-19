@@ -180,11 +180,11 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
            -log_ydstogo,-log_ydstogo_end,
            -Goal_To_Go_end,-end_half_game_end,
            #-start_time.hours,-end_time.hours,
-           -id_play.y,-Under_two_end) %>% select(
+           -Under_two_end) %>% select(
              game_id,
              drive_id,
              new_id,
-             id_play.x,
+             id_play,
              offense_play,
              defense_play,
              home,
@@ -280,7 +280,9 @@ prep_pbp_df <- function(df) {
       half = ifelse(period <= 2, 1, 2),
       new_id = gsub(pattern = unique(game_id), "", x = id_play),
       new_id = as.numeric(new_id),
-      log_ydstogo = log(distance)
+      log_ydstogo = log(distance),
+      down = ifelse(down == 5 &
+                      str_detect(play_type, "Kickoff"),1, down)
     ) %>% filter(period <= 4, down > 0) %>%
     filter(!is.na(down),!is.na(raw_secs)) %>% rename(TimeSecsRem = raw_secs)
 
