@@ -37,18 +37,13 @@ create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
   Off_Win_Prob = as.vector(predict(wp_model, newdata = df, type = "response"))
   df$wp = Off_Win_Prob
 
-  if (length(unique(df$game_id)) == 1) {
-    df2 = wpa_calcs(df)
-  }
-  if (length(unique(df$game_id)) >= 1) {
-    g_ids = sort(unique(df$game_id))
-    df2 = purrr::map_dfr(g_ids,
-                         function(x) {
-                           df %>%
-                             filter(game_id == x) %>%
-                             wpa_calcs()
-                         })
-  }
+  g_ids = sort(unique(df$game_id))
+  df2 = purrr::map_dfr(g_ids,
+                       function(x) {
+                         df %>%
+                           filter(game_id == x) %>%
+                           wpa_calcs()
+                       })
   return(df2)
 }
 
@@ -69,11 +64,10 @@ wpa_calcs <- function(df) {
     mutate(
       # base wpa
       end_of_half = ifelse(half == lead(half), 0, 1),
-      lag_wp = dplyr::lag(wp),
-      lag_wp = if_else(is.na(lag_wp),0.5,lag_wp),
-      wpa_base = wp - lag_wp,
+      lead_wp = dplyr::lead(wp),
       # account for turnover
-      wpa_change = ifelse(change_of_poss == 1, (1 - wp) - lag_wp, wpa_base),
+      wpa_base = lead_wp - wp,
+      wpa_change = ifelse(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
       wpa = ifelse(end_of_half == 1, 0, wpa_change),
       home_wp_post = ifelse(offense_play == home,
                             home_wp + wpa,
