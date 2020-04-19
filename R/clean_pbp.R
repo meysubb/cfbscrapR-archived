@@ -38,6 +38,10 @@ clean_pbp_dat <- function(raw_df) {
   pun_td_sq = (raw_df$play_type == "Punt Touchdown Touchdown")
   raw_df$play_type[pun_td_sq] <- "Punt Touchdown"
 
+  raw_df = raw_df %>% mutate(
+    half = ifelse(period <= 2, 1, 2)
+  )
+
   return(raw_df)
 }
 
