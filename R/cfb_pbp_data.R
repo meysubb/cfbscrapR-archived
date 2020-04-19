@@ -113,9 +113,17 @@ cfb_pbp_data <- function(year,
         setdiff(names(.), rm_cols)
       )
     if(epa_wpa){
+      play_df = clean_pbp_dat(play_df)
+      g_ids = sort(unique(play_df$game_id))
+      play_df = purrr::map_dfr(g_ids,
+                                     function(x) {
+                                       play_df %>%
+                                         filter(game_id == x) %>%
+                                         add_timeout_cols()
+                                     })
       play_df = calculate_epa(play_df)
       play_df = create_wpa(play_df)
-      play_df = play_df %>% group_by(drive_id) %>% arrange(new_id,.by_group=T)
+      play_df = play_df %>% group_by(drive_id) %>% arrange(new_id,.by_group=T) %>% ungroup()
     }
   }
   return(play_df)

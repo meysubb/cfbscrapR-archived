@@ -14,11 +14,18 @@
 #'
 
 create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
-  col_nec = c("ExpScoreDiff", "TimeSecsRem", "half", "Under_two")
+  col_nec = c(
+    "ExpScoreDiff",
+    "TimeSecsRem",
+    "half",
+    "Under_two",
+    "off_timeouts_rem_before",
+    "def_timeouts_rem_before"
+  )
   if (!all(col_nec %in% colnames(df))) {
     df = df %>% mutate(
       score_diff = offense_score - defense_score,
-      home_EPA = ifelse(offense_play == home, EPA, -EPA),
+      home_EPA = ifelse(offense_play == home, EPA,-EPA),
       away_EPA = -home_EPA,
       ExpScoreDiff = score_diff + ep_before,
       half = as.factor(half),
@@ -30,18 +37,13 @@ create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
   Off_Win_Prob = as.vector(predict(wp_model, newdata = df, type = "response"))
   df$wp = Off_Win_Prob
 
-  if (length(unique(df$game_id)) == 1) {
-    df2 = wpa_calcs(df)
-  }
-  if (length(unique(df$game_id)) >= 1) {
-    g_ids = sort(unique(df$game_id))
-    df2 = purrr::map_dfr(g_ids,
-                         function(x) {
-                           df %>%
-                             filter(game_id == x) %>%
-                             wpa_calcs()
-                         })
-  }
+  g_ids = sort(unique(df$game_id))
+  df2 = purrr::map_dfr(g_ids,
+                       function(x) {
+                         df %>%
+                           filter(game_id == x) %>%
+                           wpa_calcs()
+                       })
   return(df2)
 }
 
@@ -62,9 +64,9 @@ wpa_calcs <- function(df) {
     mutate(
       # base wpa
       end_of_half = ifelse(half == lead(half), 0, 1),
-      lead_wp = lead(wp),
-      wpa_base = lead_wp - wp,
+      lead_wp = dplyr::lead(wp),
       # account for turnover
+      wpa_base = lead_wp - wp,
       wpa_change = ifelse(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
       wpa = ifelse(end_of_half == 1, 0, wpa_change),
       home_wp_post = ifelse(offense_play == home,
