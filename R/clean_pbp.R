@@ -25,7 +25,7 @@ clean_pbp_dat <- function(raw_df) {
     !is.na(raw_df$play_text)
   fumble_vec = str_detect(raw_df$play_text, "fumble")
   rush_vec = raw_df$play_type=="Rush"
-  pass_vec = raw_df$play_type=="Pass"
+  pass_vec = raw_df$play_type=="Pass Reception"
   ## tourchdown check , want where touchdowns aren't in the play_type
   td_check = !str_detect(raw_df$play_type, "Touchdown")
   # fix kickoff fumble return TDs
