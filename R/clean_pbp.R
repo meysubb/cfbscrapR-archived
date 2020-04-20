@@ -15,7 +15,8 @@
 clean_pbp_dat <- function(raw_df) {
   td_e = str_detect(raw_df$play_text, "TD") |
     str_detect(raw_df$play_text, "Touchdown") |
-    str_detect(raw_df$play_text, "TOUCHDOWN")
+    str_detect(raw_df$play_text, "TOUCHDOWN") |
+    str_detect(raw_df$play_text, "touchdown")
   ## vectors
   kick_vec = str_detect(raw_df$play_text, "KICK") &
     !is.na(raw_df$play_text)
@@ -23,6 +24,8 @@ clean_pbp_dat <- function(raw_df) {
                 str_detect(raw_df$play_text, "punt")) &
     !is.na(raw_df$play_text)
   fumble_vec = str_detect(raw_df$play_text, "fumble")
+  rush_vec = raw_df$play_type=="Rush"
+  pass_vec = raw_df$play_type=="Pass"
   ## tourchdown check , want where touchdowns aren't in the play_type
   td_check = !str_detect(raw_df$play_type, "Touchdown")
   # fix kickoff fumble return TDs
@@ -34,6 +37,10 @@ clean_pbp_dat <- function(raw_df) {
   raw_df$play_type[punt_vec & td_e & td_check] <-
     paste0(raw_df$play_type[punt_vec &
                               td_e & td_check], " Touchdown")
+  # fix pass tds that aren't explicit
+  raw_df$play_type[td_e & rush_vec] = "Rushing Touchdown"
+  raw_df$play_type[td_e & pass_vec] = "Passing Touchdown"
+  # fix
   # fix douplicate TD names
   pun_td_sq = (raw_df$play_type == "Punt Touchdown Touchdown")
   raw_df$play_type[pun_td_sq] <- "Punt Touchdown"
