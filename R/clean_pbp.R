@@ -46,8 +46,11 @@ clean_pbp_dat <- function(raw_df) {
   raw_df$play_type[pun_td_sq] <- "Punt Touchdown"
 
   raw_df = raw_df %>% mutate(
+    down = ifelse(down == 5 &
+                    str_detect(play_type, "Kickoff"),1, down),
     half = ifelse(period <= 2, 1, 2)
   )
+
 
   return(raw_df)
 }
