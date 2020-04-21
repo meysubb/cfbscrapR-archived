@@ -122,9 +122,6 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
   prep_df_after$ep_after = apply(ep_end, 1, function(row) {
     sum(row * weights)
   })
-  # pred_df$ep_after = apply(ep_end, 1, function(row) {
-  #   sum(row * weights)
-  # })
 
   colnames(prep_df_after)[4:11] = paste0(colnames(prep_df_after)[4:11], "_end")
   pred_df = clean_pbp_dat %>% left_join(prep_df_after,
