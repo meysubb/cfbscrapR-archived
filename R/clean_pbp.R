@@ -45,6 +45,12 @@ clean_pbp_dat <- function(raw_df) {
   pun_td_sq = (raw_df$play_type == "Punt Touchdown Touchdown")
   raw_df$play_type[pun_td_sq] <- "Punt Touchdown"
 
+  ## fix penalty detection
+  not_pen_play_type = (raw_df$play_type != "Penalty") | (raw_df$play_type != "PENALTY")
+  pen_text = str_detect(raw_df$play_text,"Penalty") | str_detect(raw_df$play_text,"penalty") | str_detect(raw_df$play_text,"PENALTY")
+
+  raw_df$play_type[not_pen_play_type & pen_text] <- "Penalty"
+
   raw_df = raw_df %>% mutate(
     down = ifelse(down == 5 &
                     str_detect(play_type, "Kickoff"),1, down),
