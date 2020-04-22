@@ -40,8 +40,7 @@ cfb_pbp_data <- function(year,
   ## Year, Week, Team
   if(is.null(drive)){
     play_base_url <- paste0("https://api.collegefootballdata.com/plays?seasonType=",season_type,'&')
-  }
-  else{
+  } else{
     play_base_url <- paste0("https://api.collegefootballdata.com/drives?seasonType=",season_type,'&')
   }
 
