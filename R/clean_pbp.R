@@ -77,7 +77,7 @@ clean_pbp_dat <- function(raw_df) {
   fum_td_sq = (raw_df$play_type == "Fumble Return Touchdown Touchdown")
   raw_df$play_type[fum_td_sq] == "Fumble Return Touchdown"
   rush_td_sq = (raw_df$play_type == "Rushing Touchdown Touchdown")
-  raw_df$play_type[fum_td_sq] == "Rushing Touchdown"
+  raw_df$play_type[rush_td_sq] == "Rushing Touchdown"
 
   ## penalty detection
   not_pen_play_type = (raw_df$play_type != "Penalty") | (raw_df$play_type != "PENALTY")
