@@ -55,12 +55,7 @@ wpa_calcs <- function(df) {
                       wp, def_wp),
     away_wp = if_else(offense_play != home,
                       wp, def_wp)
-  ) %>% group_by(half) %>%
-    mutate(
-      # ball changes hand
-      change_of_poss = ifelse(offense_play == lead(offense_play), 0, 1),
-      change_of_poss = ifelse(is.na(change_of_poss), 0, change_of_poss)
-    ) %>% ungroup() %>%
+  ) %>%
     mutate(
       # base wpa
       end_of_half = ifelse(half == lead(half), 0, 1),
