@@ -13,7 +13,7 @@
 #'
 
 clean_pbp_dat <- function(raw_df) {
-  #-- add change of possession to df
+  ## add change of possession to df
   raw_df <- raw_df %>%
     mutate(half = ifelse(period <= 2, 1, 2)) %>%
     group_by(game_id, half) %>%
@@ -79,18 +79,28 @@ clean_pbp_dat <- function(raw_df) {
   raw_df$play_type[rush_td_sq] == "Rushing Touchdown"
 
   ## penalty detection
+  #-- penalty in play text
   pen_text = str_detect(raw_df$play_text, "Penalty") |
     str_detect(raw_df$play_text, "penalty") |
     str_detect(raw_df$play_text, "PENALTY")
+  #-- declined in play text
+  pen_declined_text = str_detect(raw_df$play_text,"declined")|
+    str_detect(raw_df$play_text,"Declined")|
+    str_detect(raw_df$play_text,"DECLINED")
+  #-- penalty play_types
   pen_type = raw_df$play_type == "Penalty"  | raw_df$play_type == "penalty"
+  #-- penalty_flag T/F flag conditions
   raw_df$penalty_flag = F
   raw_df$penalty_flag[pen_type] <- T
   raw_df$penalty_flag[pen_text] <- T
+  #-- penalty_declined T/F flag conditions
+  raw_df$penalty_declined = F
+  raw_df$penalty_declined[pen_text & pen_declined_text] <- T
+  raw_df$penalty_declined[pen_type & pen_declined_text] <- T
 
   ## kickoff down adjustment
-  raw_df = raw_df %>% mutate(down = ifelse(down == 5 &
-                                             str_detect(play_type, "Kickoff"), 1, down))
-
+  raw_df = raw_df %>%
+    mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down))
 
   return(raw_df)
 }
