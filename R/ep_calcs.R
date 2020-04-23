@@ -26,7 +26,6 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     "Field Goal Missed",
     "Fumble Recovery (Opponent)",
     "Fumble Recovery (Opponent) Touchdown",
-    "Fumble Return Touchdown Touchdown",
     "Missed Field Goal Return",
     "Missed Field Goal Return Touchdown",
     "Interception",
@@ -45,8 +44,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     "Field Goal Good",
     "Pass Reception Touchdown",
     "Fumble Recovery (Own) Touchdown",
-    "Punt Touchdown",
-    "Rushing Touchdown Touchdown"
+    "Punt Touchdown"
   )
   def_TD = c(
     "Blocked Punt Touchdown",
@@ -58,7 +56,6 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     "Punt Return Touchdown",
     "Blocked Field Goal Touchdown",
     "Fumble Recovery (Opponent) Touchdown",
-    "Fumble Return Touchdown Touchdown",
     "Pass Interception Return Touchdown",
     "Sack Touchdown",
     "Uncategorized Touchdown"
@@ -305,7 +302,9 @@ prep_pbp_df <- function(df) {
 
 epa_fg_probs <- function(dat, current_probs, fg_mod) {
   fg_ind = str_detect((dat$play_type), "Field Goal")
-  fg_dat = dat[fg_ind, ]
+  ep_ind = str_detect((dat$play_type), "Extra Point")
+  inds = fg_ind | ep_ind
+  fg_dat = dat[inds, ]
 
   # we are setting everythign after 0 seconds to have
   # 0 probs.
@@ -368,7 +367,6 @@ prep_df_epa2 <- function(dat) {
     "Fumble Recovery (Opponent)",
     "Fumble Recovery (Opponent) Touchdown",
     "Fumble Return Touchdown",
-    "Fumble Return Touchdown Touchdown",
     "Interception",
     "Interception Return Touchdown",
     "Pass Interception Return",
@@ -414,7 +412,6 @@ prep_df_epa2 <- function(dat) {
     "Punt Return Touchdown",
     "Fumble Recovery (Opponent) Touchdown",
     "Fumble Return Touchdown",
-    "Fumble Return Touchdown Touchdown",
     "Defensive 2pt Conversion",
     "Safety",
     "Sack Touchdown",
@@ -433,7 +430,6 @@ prep_df_epa2 <- function(dat) {
     "Fumble Recovery (Opponent)",
     "Fumble Recovery (Opponent) Touchdown",
     "Fumble Return Touchdown",
-    "Fumble Return Touchdown Touchdown",
     "Defensive 2pt Conversion",
     "Interception",
     "Interception Return Touchdown",
@@ -458,8 +454,7 @@ prep_df_epa2 <- function(dat) {
     "Field Goal Good",
     "Pass Reception Touchdown",
     "Fumble Recovery (Own) Touchdown",
-    "Punt Touchdown",
-    "Rushing Touchdown Touchdown"
+    "Punt Touchdown"
   )
   kickoff = c(
     "Kickoff",
