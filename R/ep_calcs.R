@@ -404,6 +404,7 @@ prep_df_epa2 <- function(dat) {
 
   dat$turnover[t_ind] <- 1
 
+  #--play_type vectors------
 
   defense_score_vec = c(
     "Blocked Punt Touchdown",
@@ -463,6 +464,7 @@ prep_df_epa2 <- function(dat) {
     "Kickoff Return Touchdown",
     "Kickoff Touchdown"
   )
+  #----
   dat = dat %>% group_by(game_id, half) %>%
     dplyr::arrange(id_play, .by_group = TRUE) %>%
     mutate(
@@ -475,18 +477,63 @@ prep_df_epa2 <- function(dat) {
       ),
       down = as.numeric(down),
       new_down = case_when(
+        # 8 cases with three T/F penalty flags
+        # 4 cases in 1
+        play_type %in% penalty & penalty_1st_conv ~ 1,
+        # offsetting penalties, no penalties declined, no 1st down by penalty (1 case)
+        play_type %in% penalty & !penalty_declined &
+          penalty_offset & !penalty_1st_conv ~ down,
+        # offsetting penalties, penalty declined true, no 1st down by penalty
+        # seems like it would be a regular play at that point (1 case, split in three)
+        play_type %in% penalty & penalty_declined &
+          penalty_offset & !penalty_1st_conv &
+          yards_gained < distance & down <= 3 ~ down+1,
+        play_type %in% penalty & penalty_declined &
+          penalty_offset & !penalty_1st_conv &
+          yards_gained < distance & down == 4 ~ 1,
+        play_type %in% penalty & penalty_declined &
+          penalty_offset & !penalty_1st_conv &
+          yards_gained > distance ~ 1,
+        # only penalty declined true (1 case, split in three)
+        play_type %in% penalty & penalty_declined &
+          !penalty_offset & !penalty_1st_conv &
+          yards_gained < distance & down <= 3 ~ down+1,
+        play_type %in% penalty & penalty_declined &
+          !penalty_offset & !penalty_1st_conv &
+          yards_gained < distance & down == 4 ~ 1,
+        play_type %in% penalty & penalty_declined &
+          !penalty_offset & !penalty_1st_conv &
+          yards_gained >= distance ~ 1,
+        # no flags true, lead on down (1 case)
+        play_type %in% penalty & !penalty_declined &
+          !penalty_offset & !penalty_1st_conv ~ as.numeric(lead(down, order_by=id_play)),
         play_type %in% score ~ 1,
         play_type %in% kickoff ~ 1,
         play_type %in% turnover_vec ~ 1,
         play_type %in% defense_score_vec ~ 1,
         play_type %in% normalplay & yards_gained >= distance ~ 1,
         play_type %in% normalplay & yards_gained < distance & down <= 3 ~ down + 1,
-        play_type %in% normalplay & yards_gained < distance & down == 4 ~ 1,
-        play_type %in% penalty ~ as.numeric(lead(down, order_by=id_play))
+        play_type %in% normalplay & yards_gained < distance & down == 4 ~ 1
       ),
       yards_gained = as.numeric(yards_gained),
       start_yards_to_goal = as.numeric(start_yards_to_goal),
       new_distance = as.numeric(case_when(
+        ##--Penalty cases----
+        #--offsetting penalties, keep same distance----
+        play_type %in% penalty &
+          penalty_offset ~ distance,
+        #--penalty first down conversions, 10 or to goal----
+        play_type %in% penalty &
+          penalty_1st_conv ~ ifelse(yards_to_goal  - yards_gained <= 10,
+                                               yards_to_goal,10),
+        #--penalty without first down conversion----
+
+        play_type %in% penalty & !penalty_declined &
+          !penalty_1st_conv &
+          !penalty_offset ~ ifelse((yards_gained >= distance) &
+                                (yards_to_goal - yards_gained <= 10),
+                                 yards_to_goal,10),
+
         play_type %in% normalplay &
           yards_gained >= distance &
           (yards_to_goal - yards_gained >= 10) ~ 10,
@@ -509,17 +556,16 @@ prep_df_epa2 <- function(dat) {
         #   (100 - (yards_to_goal + yards_gained) <= 10) ~ 100 - (yards_to_goal  + yards_gained),
         play_type %in% defense_score_vec ~ 0,
         play_type %in% score ~ 0,
-        play_type %in% kickoff ~ 10,
-        play_type %in% penalty ~ as.numeric(lead(distance, order_by=id_play))
+        play_type %in% kickoff ~ 10
       )),
-
       new_yardline = as.numeric(case_when(
+        play_type %in% penalty & penalty_offset ~ yards_to_goal,
+        play_type %in% penalty & !penalty_offset ~ yards_to_goal - yards_gained,
         play_type %in% normalplay ~ yards_to_goal - yards_gained,
         play_type %in% score ~ 0,
         play_type %in% defense_score_vec ~ 0,
         play_type %in% kickoff ~ start_yards_to_goal,
         play_type %in% turnover_vec ~ 100 - yards_to_goal + yards_gained,
-        play_type %in% penalty ~ as.numeric(lead(yards_to_goal, order_by=id_play))
       )),
 
       new_TimeSecsRem = ifelse(!is.na(lead(TimeSecsRem,order_by=id_play)),lead(TimeSecsRem,order_by=id_play),0),
@@ -608,8 +654,6 @@ prep_df_epa2 <- function(dat) {
       new_Goal_To_Go,
       new_Under_two,
       end_half_game,
-      penalty_flag,
-      penalty_declined,
       turnover
     ) %>% arrange(id_play) %>%
     mutate(id_play = gsub(pattern = unique(game_id), "", x = id_play),
