@@ -302,7 +302,9 @@ prep_pbp_df <- function(df) {
 
 epa_fg_probs <- function(dat, current_probs, fg_mod) {
   fg_ind = str_detect((dat$play_type), "Field Goal")
-  fg_dat = dat[fg_ind, ]
+  ep_ind = str_detect((dat$play_type), "Extra Point")
+  inds = fg_ind | ep_ind
+  fg_dat = dat[inds, ]
 
   # we are setting everythign after 0 seconds to have
   # 0 probs.
