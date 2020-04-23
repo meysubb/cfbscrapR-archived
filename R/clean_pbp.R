@@ -14,7 +14,7 @@
 
 clean_pbp_dat <- function(raw_df) {
   #-- add change of possession to df
-  raw_df <- play_df %>%
+  raw_df <- raw_df %>%
     mutate(half = ifelse(period <= 2, 1, 2)) %>%
     group_by(game_id, half) %>%
     mutate(
