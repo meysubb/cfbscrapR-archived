@@ -85,7 +85,7 @@ clean_pbp_dat <- function(raw_df) {
   pen_type = raw_df$play_type == "Penalty"  | raw_df$play_type == "penalty"
   raw_df$penalty_flag = F
   raw_df$penalty_flag[pen_type] <- T
-  raw_df$penalty_flag[not_pen_play_type & pen_text] <- T
+  raw_df$penalty_flag[pen_text] <- T
 
   ## kickoff down adjustment
   raw_df = raw_df %>% mutate(down = ifelse(down == 5 &
