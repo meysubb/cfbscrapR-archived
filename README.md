@@ -35,4 +35,5 @@ devtools::install_github("meysubb/cfbscrapR")
 * ```plot_wpa(df,away_color,home_color,winner="away")```: Plot WPA 
 
 ## EP/WP Model
-You can find more detailed information and explanation on the EP/WP models in the `cfbscrapR-misc` repository. Link: [cfbscrapR-misc](https://github.com/meysubb/cfbscrapR-misc "cfbscrapR-misc GitHub repository") 
+You can find more detailed information and explanation on the EP/WP models in the `cfbscrapR-misc` repository.   
+Link: [cfbscrapR-misc](https://github.com/meysubb/cfbscrapR-misc "cfbscrapR-misc GitHub repository") 
