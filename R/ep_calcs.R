@@ -482,7 +482,8 @@ prep_df_epa2 <- function(dat) {
   turnover_play_check = dat$play_type %in% turnover_vec
   # turnoversonly occur on actual change of offense
   # but not scoring plays
-  # and not at the end of half
+  # and not at the end of half.
+  # Turnovers now capture downs, when there is a change of offense after a fourth down normal play. 
   t_ind = (turnover_ind | (new_offense)) & !scoring_plays & !end_of_half_plays & (turnover_play_check | downs_turnover)
 
   dat$turnover[t_ind] <- 1
