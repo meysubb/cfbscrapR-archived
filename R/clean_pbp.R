@@ -13,64 +13,64 @@
 #'
 
 clean_pbp_dat <- function(raw_df) {
-  #-- add change of possession to df
+  ## add change of possession to df----
   raw_df <- raw_df %>%
     mutate(half = ifelse(period <= 2, 1, 2)) %>%
     group_by(game_id, half) %>%
     mutate(
-      #-- ball changes hand
+      #-- ball changes hand----
       change_of_poss = ifelse(offense_play == lead(offense_play, order_by = id_play), 0, 1),
       change_of_poss = ifelse(is.na(change_of_poss), 0, change_of_poss)
     ) %>% ungroup() %>% arrange(game_id, id_play)
 
   ## vectors
-  #-- touchdowns
+  #-- touchdowns----
   td_e = str_detect(raw_df$play_text, "TD") |
     str_detect(raw_df$play_text, "Touchdown") |
     str_detect(raw_df$play_text, "TOUCHDOWN") |
     str_detect(raw_df$play_text, "touchdown")
 
-  #-- kicks/punts
+  #-- kicks/punts----
   kick_vec = str_detect(raw_df$play_text, "KICK") &
     !is.na(raw_df$play_text)
   punt_vec = (str_detect(raw_df$play_text, "Punt") |
                 str_detect(raw_df$play_text, "punt")) &
     !is.na(raw_df$play_text)
-  #-- fumbles
+  #-- fumbles----
   fumble_vec = str_detect(raw_df$play_text, "fumble")
-  #-- pass/rush
+  #-- pass/rush----
   rush_vec = raw_df$play_type == "Rush"
   pass_vec = raw_df$play_type == "Pass Reception"
-  #-- sacks
-  #- only want non-safety sacks, otherwise would be an additional condition
+  #-- sacks----
+  #- only want non-safety sacks, otherwise would be an additional condition----
   sack_vec = raw_df$play_type == "Sack" |
     raw_df$play_type == "Sack Touchdown"
   #-- change of possession
   poss_change_vec = raw_df$change_of_poss == 1
 
-  ## Fix strip-sacks to fumbles
+  ## Fix strip-sacks to fumbles----
   raw_df$play_type[fumble_vec &
                      sack_vec & poss_change_vec & !td_e] <-
     "Fumble Recovery (Opponent)"
   raw_df$play_type[fumble_vec & sack_vec & td_e] <-
     "Fumble Recovery (Opponent) Touchdown"
 
-  ## touchdown check, want where touchdowns aren't in the play_type
+  ## touchdown check, want where touchdowns aren't in the play_type----
   td_check = !str_detect(raw_df$play_type, "Touchdown")
-  #-- fix kickoff fumble return TDs
+  #-- fix kickoff fumble return TDs----
   raw_df$play_type[kick_vec & fumble_vec & td_e & td_check] <-
     paste0(raw_df$play_type[kick_vec &
                               fumble_vec &
                               td_e & td_check], " Touchdown")
-  #-- fix punt return TDs
+  #-- fix punt return TDs----
   raw_df$play_type[punt_vec & td_e & td_check] <-
     paste0(raw_df$play_type[punt_vec &
                               td_e & td_check], " Touchdown")
-  #-- fix rush/pass tds that aren't explicit
+  #-- fix rush/pass tds that aren't explicit----
   raw_df$play_type[td_e & rush_vec] = "Rushing Touchdown"
   raw_df$play_type[td_e & pass_vec] = "Passing Touchdown"
 
-  #-- fix duplicated TD play_type labels
+  #-- fix duplicated TD play_type labels----
   pun_td_sq = (raw_df$play_type == "Punt Touchdown Touchdown")
   raw_df$play_type[pun_td_sq] <- "Punt Touchdown"
   fum_td_sq = (raw_df$play_type == "Fumble Return Touchdown Touchdown")
@@ -78,19 +78,57 @@ clean_pbp_dat <- function(raw_df) {
   rush_td_sq = (raw_df$play_type == "Rushing Touchdown Touchdown")
   raw_df$play_type[rush_td_sq] == "Rushing Touchdown"
 
-  ## penalty detection
+  ## penalty detection-----
+  #-- penalty in play text----
   pen_text = str_detect(raw_df$play_text, "Penalty") |
     str_detect(raw_df$play_text, "penalty") |
     str_detect(raw_df$play_text, "PENALTY")
+  #-- declined in play text----
+  pen_declined_text = str_detect(raw_df$play_text,"declined")|
+    str_detect(raw_df$play_text,"Declined")|
+    str_detect(raw_df$play_text,"DECLINED")
+  #--NO PLAY in play text----
+  pen_no_play_text = str_detect(raw_df$play_text,"no play")|
+    str_detect(raw_df$play_text,"No Play")|
+    str_detect(raw_df$play_text,"NO PLAY")
+  #--off-setting in play text----
+  pen_offset_text = str_detect(raw_df$play_text,"off-setting")|
+    str_detect(raw_df$play_text,"Off-Setting")|
+    str_detect(raw_df$play_text,"OFF-SETTING")
+  pen_1st_down_text = str_detect(raw_df$play_text,"1st down")|
+    str_detect(raw_df$play_text,"1st Down")|
+    str_detect(raw_df$play_text,"1st DOWN")|
+    str_detect(raw_df$play_text,"1ST Down")|
+    str_detect(raw_df$play_text,"1ST down")|
+    str_detect(raw_df$play_text,"1ST DOWN")
+
+  #-- penalty play_types
   pen_type = raw_df$play_type == "Penalty"  | raw_df$play_type == "penalty"
+
+  #-- penalty_flag T/F flag conditions
   raw_df$penalty_flag = F
   raw_df$penalty_flag[pen_type] <- T
   raw_df$penalty_flag[pen_text] <- T
+  #-- penalty_declined T/F flag conditions
+  raw_df$penalty_declined = F
+  raw_df$penalty_declined[pen_text & pen_declined_text] <- T
+  raw_df$penalty_declined[pen_type & pen_declined_text] <- T
+  #-- penalty_no_play T/F flag conditions
+  raw_df$penalty_no_play = F
+  raw_df$penalty_no_play[pen_text & pen_no_play_text] <- T
+  raw_df$penalty_no_play[pen_type & pen_no_play_text] <- T
+  #-- penalty_offset T/F flag conditions
+  raw_df$penalty_offset = F
+  raw_df$penalty_offset[pen_text & pen_offset_text] <- T
+  raw_df$penalty_offset[pen_type & pen_offset_text] <- T
+  #-- penalty_1st_conv T/F flag conditions
+  raw_df$penalty_1st_conv = F
+  raw_df$penalty_1st_conv[pen_text & pen_1st_down_text] <- T
+  raw_df$penalty_1st_conv[pen_type & pen_1st_down_text] <- T
 
   ## kickoff down adjustment
-  raw_df = raw_df %>% mutate(down = ifelse(down == 5 &
-                                             str_detect(play_type, "Kickoff"), 1, down))
-
+  raw_df = raw_df %>%
+    mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down))
 
   return(raw_df)
 }
