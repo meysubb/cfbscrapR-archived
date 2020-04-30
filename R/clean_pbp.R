@@ -128,7 +128,8 @@ clean_pbp_dat <- function(raw_df) {
 
   ## kickoff down adjustment
   raw_df = raw_df %>%
-    mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down))
+    mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down),
+           down = ifelse(down == 5 & str_detect(play_type, "Penalty"),1 , down))
 
   return(raw_df)
 }
