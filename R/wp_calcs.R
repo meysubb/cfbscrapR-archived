@@ -49,6 +49,17 @@ create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
 
 
 wpa_calcs <- function(df) {
+  ## add change of possession to df----
+  ## do this last because we process
+  ## new TDs etc
+  df <- df %>%
+    group_by(half) %>%
+    mutate(
+      #-- ball changes hand----
+      change_of_poss = ifelse(offense_play == lead(offense_play, order_by = id_play), 0, 1),
+      change_of_poss = ifelse(is.na(change_of_poss), 0, change_of_poss)
+    ) %>% ungroup() %>% arrange(id_play)
+
   df2 = df %>% mutate(
     def_wp = 1 - wp,
     home_wp = if_else(offense_play == home,
@@ -62,7 +73,7 @@ wpa_calcs <- function(df) {
       lead_wp = dplyr::lead(wp),
       # account for turnover
       wpa_base = lead_wp - wp,
-      wpa_change = ifelse(turnover == 1, (1 - lead_wp) - wp, wpa_base),
+      wpa_change = ifelse(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
       wpa = ifelse(end_of_half == 1, 0, wpa_change),
       home_wp_post = ifelse(offense_play == home,
                             home_wp + wpa,

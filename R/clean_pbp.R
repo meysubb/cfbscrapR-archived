@@ -13,16 +13,6 @@
 #'
 
 clean_pbp_dat <- function(raw_df) {
-  ## add change of possession to df----
-  raw_df <- raw_df %>%
-    mutate(half = ifelse(period <= 2, 1, 2)) %>%
-    group_by(game_id, half) %>%
-    mutate(
-      #-- ball changes hand----
-      change_of_poss = ifelse(offense_play == lead(offense_play, order_by = id_play), 0, 1),
-      change_of_poss = ifelse(is.na(change_of_poss), 0, change_of_poss)
-    ) %>% ungroup() %>% arrange(game_id, id_play)
-
   ## vectors
   #-- touchdowns----
   td_e = str_detect(raw_df$play_text, "TD") |
@@ -40,7 +30,7 @@ clean_pbp_dat <- function(raw_df) {
   fumble_vec = str_detect(raw_df$play_text, "fumble")
   #-- pass/rush----
   rush_vec = raw_df$play_type == "Rush"
-  pass_vec = raw_df$play_type == "Pass Reception"
+  pass_vec = raw_df$play_type == "Pass Reception" | raw_df$play_type == "Pass Completion" | raw_df$play_type == "Pass"
   #-- sacks----
   #- only want non-safety sacks, otherwise would be an additional condition----
   sack_vec = raw_df$play_type == "Sack" |
@@ -129,7 +119,8 @@ clean_pbp_dat <- function(raw_df) {
   ## kickoff down adjustment
   raw_df = raw_df %>%
     mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down),
-           down = ifelse(down == 5 & str_detect(play_type, "Penalty"),1 , down))
+           down = ifelse(down == 5 & str_detect(play_type, "Penalty"),1 , down),
+           half = ifelse(period <= 2, 1, 2))
 
   return(raw_df)
 }
