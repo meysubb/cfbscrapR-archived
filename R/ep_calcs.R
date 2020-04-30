@@ -468,7 +468,7 @@ prep_df_epa2 <- function(dat) {
     "Kickoff Return Touchdown",
     "Kickoff Touchdown"
   )
-  
+
   turnover_ind = dat$play_type %in% turnover_play_type
   dat$turnover = 0
 
@@ -476,7 +476,7 @@ prep_df_epa2 <- function(dat) {
   new_offense = !(dat$offense_play == lead(dat$offense_play,order_by = dat$id_play))
   scoring_plays = dat$play_type %in% score
   # end of half check as well
-  end_of_half_plays = !(dat$half == lead(dat$half))
+  end_of_half_plays = !(dat$half == lead(dat$half,order_by = dat$id_play))
   # is specifically defined as a turnover
   turnover_play_check = dat$play_type %in% turnover_vec
   # turnoversonly occur on actual change of offense
