@@ -62,7 +62,7 @@ wpa_calcs <- function(df) {
       lead_wp = dplyr::lead(wp),
       # account for turnover
       wpa_base = lead_wp - wp,
-      wpa_change = ifelse(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
+      wpa_change = ifelse(turnover == 1, (1 - lead_wp) - wp, wpa_base),
       wpa = ifelse(end_of_half == 1, 0, wpa_change),
       home_wp_post = ifelse(offense_play == home,
                             home_wp + wpa,
