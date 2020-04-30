@@ -344,24 +344,24 @@ epa_fg_probs <- function(dat, current_probs, fg_mod) {
   current_probs2 <- current_probs
   #current_probs2[fg_ind,] <- current_probs[fg_ind,] * (1-make_fg_prob)
   val = (1 - make_fg_prob)
-  ind <- dim(current_probs2[fg_ind, ])[1]
+  ind <- dim(current_probs2[inds, ])[1]
   for (i in seq(1, ind)) {
-    temp = current_probs2[fg_ind, ]
+    temp = current_probs2[inds, ]
     temp[i, ] = temp[i, ] * val[i]
   }
-  current_probs2[fg_ind, ] =  temp
+  current_probs2[inds, ] =  temp
 
 
   # now to flip all the probs,
-  current_probs2[fg_ind, "FG"] <-
-    make_fg_prob + current_probs[fg_ind, "Opp_FG"]
-  current_probs2[fg_ind, "Opp_FG"] <- current_probs[fg_ind, "FG"]
-  current_probs2[fg_ind, "TD"] <- current_probs[fg_ind, "Opp_TD"]
-  current_probs2[fg_ind, "Opp_TD"] <- current_probs[fg_ind, "TD"]
-  current_probs2[fg_ind, "Safety"] <-
-    current_probs[fg_ind, "Opp_Safety"]
-  current_probs2[fg_ind, "Opp_Safety"] <-
-    current_probs[fg_ind, "Safety"]
+  current_probs2[inds, "FG"] <-
+    make_fg_prob + current_probs[inds, "Opp_FG"]
+  current_probs2[inds, "Opp_FG"] <- current_probs[inds, "FG"]
+  current_probs2[inds, "TD"] <- current_probs[inds, "Opp_TD"]
+  current_probs2[inds, "Opp_TD"] <- current_probs[inds, "TD"]
+  current_probs2[inds, "Safety"] <-
+    current_probs[inds, "Opp_Safety"]
+  current_probs2[inds, "Opp_Safety"] <-
+    current_probs[inds, "Safety"]
   return(current_probs2)
 }
 
