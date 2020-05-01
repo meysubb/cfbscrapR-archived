@@ -204,7 +204,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              defense_score,
              play_type,
              play_text,
-             scoring,
+             drive_scoring,
              TimeSecsRem,
              Under_two,
              down,
@@ -300,9 +300,6 @@ prep_pbp_df <- function(df) {
   df[fg_inds, "yards_to_goal"] = df[fg_inds, "yards_to_goal"] + 17
   df[fg_inds, "log_ydstogo"] = log(df[fg_inds, "distance"])
 
-  # kickoff_inds = str_detect(df$play_type, "Kickoff")
-  # df[kickoff_inds, "adj_yd_line"] =  100 - (100 * (1 - df[kickoff_inds, "coef"]) + (2 * df[kickoff_inds, "coef"] - 1) * df[kickoff_inds, "start_yardline"])
-
   df = df %>% mutate(Goal_To_Go = ifelse(
     str_detect(play_type, "Field Goal"),
     distance >= (yards_to_goal - 17),
@@ -397,9 +394,6 @@ prep_df_epa2 <- function(dat) {
       yards_to_goal = as.numeric(yards_to_goal),
       distance = distance,
       yards_gained = as.numeric(yards_gained),
-      start_yardline = as.numeric(start_yardline),
-      start_yards_to_goal = as.numeric(start_yards_to_goal),
-      end_yards_to_goal = as.numeric(end_yards_to_goal),
       clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
       half = ifelse(period <= 2, 1, 2),
@@ -550,7 +544,7 @@ prep_df_epa2 <- function(dat) {
         play_type %in% normalplay & yards_gained < distance & down == 4 ~ 1
       )),
       yards_gained = as.numeric(yards_gained),
-      start_yards_to_goal = as.numeric(start_yards_to_goal),
+      drive_start_yards_to_goal = as.numeric(drive_start_yards_to_goal),
 #--New Distance-----
       new_distance = as.numeric(case_when(
       ##--Penalty cases (new_distance)
@@ -600,7 +594,7 @@ prep_df_epa2 <- function(dat) {
         play_type %in% normalplay ~ yards_to_goal - yards_gained,
         play_type %in% score ~ 0,
         play_type %in% defense_score_vec ~ 0,
-        play_type %in% kickoff ~ start_yards_to_goal,
+        play_type %in% kickoff ~ drive_start_yards_to_goal,
         play_type %in% turnover_vec ~ 100 - yards_to_goal + yards_gained
       )),
 

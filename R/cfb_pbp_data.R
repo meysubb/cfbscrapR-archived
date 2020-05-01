@@ -98,19 +98,46 @@ cfb_pbp_data <- function(year,
 
   ## call/drive information
   if(is.null(drive)){
-    drive_info = cfb_pbp_data(year,season_type = season_type,team=team,week=week,drive=TRUE)
+    drive_info = cfb_pbp_data(
+      year,
+      season_type = season_type,
+      team = team,
+      week = week,
+      drive = TRUE
+    )
     clean_drive_df = clean_drive_info(drive_info)
-    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,by = "drive_id",suffix=c("_play","_drive"))
-    rm_cols = c('offense_conference_play','defense_conference_play','offense_drive','offense_conference_drive',
-      'defense_drive','defense_conference_drive','id_drive','start_time.minutes',
-      'start_time.seconds','start_period','end_period','end_yardline',
-      'end_time.minutes','end_time.seconds','elapsed.seconds','elapsed.minutes',
-      'plays'
+    colnames(clean_drive_df) <- paste0("drive_",colnames(clean_drive_df))
+    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,
+                                                                                by = c("drive_id"="drive_drive_id"),
+                                                                                suffix = c("_play", "_drive"))
+    rm_cols = c(
+      'drive_offense_conference',
+      'drive_defense_conference',
+      'drive_offense',
+      'offense_conferencec',
+      'drive_defense',
+      'defense_conference',
+      'drive_id_drive',
+      'drive_start_time.minutes',
+      'drive_start_time.seconds',
+      'drive_start_period',
+      'drive_end_period',
+      'drive_end_yardline',
+      'drive_end_time.minutes',
+      'drive_end_time.seconds',
+      'drive_elapsed.seconds',
+      'drive_elapsed.minutes',
+      'drive_plays'
     )
     play_df = play_df %>%
       select(
         setdiff(names(.), rm_cols)
-      )
+      ) %>% rename(game_id=drive_game_id,
+                   drive_pts = drive_pts_drive,
+                   drive_result = drive_drive_result,
+                   id_play=id,
+                   offense_play=offense,
+                   defense_play=defense)
     if(epa_wpa){
       play_df = clean_pbp_dat(play_df)
       g_ids = sort(unique(play_df$game_id))
