@@ -139,6 +139,11 @@ cfb_pbp_data <- function(year,
                    offense_play=offense,
                    defense_play=defense)
     if(epa_wpa){
+      if(year<=2005) {
+        warning(
+          "Data Quality prior to 2005 is not as consistent. This can affect the EPA/WPA values, proceed with caution."
+        )
+      }
       play_df = clean_pbp_dat(play_df)
       g_ids = sort(unique(play_df$game_id))
       play_df = purrr::map_dfr(g_ids,
