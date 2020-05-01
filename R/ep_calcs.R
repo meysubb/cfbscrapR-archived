@@ -222,7 +222,9 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
       rz_play = ifelse((yards_to_goal <= 20), 1, 0),
       scoring_opp = ifelse((yards_to_goal <= 40), 1, 0),
       pass = if_else(
-        play_type == "Pass Reception" | play_type == "Passing Touchdown" |
+        play_type == "Pass Reception" |
+          play_type == "Pass Completion" |
+          play_type == "Passing Touchdown" |
           play_type == "Sack" |
           play_type == "Pass Interception Return" |
           play_type == "Pass Incompletion" |
@@ -451,6 +453,7 @@ prep_df_epa2 <- function(dat) {
     "Pass",
     "Pass Reception",
     "Pass Incompletion",
+    "Pass Completion",
     "Sack",
     "Fumble Recovery (Own)"
   )
@@ -471,7 +474,8 @@ prep_df_epa2 <- function(dat) {
 
   turnover_ind = dat$play_type %in% turnover_play_type
   dat$turnover = 0
-
+  #define turnover on downs
+  downs_turnover = (dat$play_type %in% normalplay & dat$down == 4)
   # data is ordered
   new_offense = !(dat$offense_play == lead(dat$offense_play,order_by = dat$id_play))
   scoring_plays = dat$play_type %in% score
@@ -481,8 +485,9 @@ prep_df_epa2 <- function(dat) {
   turnover_play_check = dat$play_type %in% turnover_vec
   # turnoversonly occur on actual change of offense
   # but not scoring plays
-  # and not at the end of half
-  t_ind = (turnover_ind | (new_offense)) & !scoring_plays & !end_of_half_plays & turnover_play_check
+  # and not at the end of half.
+  # Turnovers now capture downs, when there is a change of offense after a fourth down normal play.
+  t_ind = (turnover_ind | (new_offense)) & !scoring_plays & !end_of_half_plays & (turnover_play_check | downs_turnover)
 
   dat$turnover[t_ind] <- 1
 
