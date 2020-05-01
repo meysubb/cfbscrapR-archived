@@ -178,7 +178,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
     mutate(EPA = ep_after - ep_before,
            # prep some variables for WPA
            score_diff = offense_score - defense_score,
-           home_EPA = ifelse(offense_play==home,EPA,-EPA),
+           home_EPA = if_else(offense_play==home,EPA,-EPA),
            away_EPA = -home_EPA,
            ExpScoreDiff = score_diff + ep_before,
            half = as.factor(half),
@@ -219,8 +219,8 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
              everything()
            ) %>%
     mutate(
-      rz_play = ifelse((yards_to_goal <= 20), 1, 0),
-      scoring_opp = ifelse((yards_to_goal <= 40), 1, 0),
+      rz_play = if_else((yards_to_goal <= 20), 1, 0),
+      scoring_opp = if_else((yards_to_goal <= 40), 1, 0),
       pass = if_else(
         play_type == "Pass Reception" |
           play_type == "Pass Completion" |
@@ -242,7 +242,7 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
         1,
         0
       ),
-      rush = ifelse(
+      rush = if_else(
         play_type == "Rush" | play_type == "Rushing Touchdown" |
           (play_type == "Safety" &
              str_detect(play_text, "run")) |
@@ -257,24 +257,24 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
         1,
         0
       ),
-      stuffed_run = ifelse((rush == 1 &
+      stuffed_run = if_else((rush == 1 &
                               yards_gained <= 0), 1, 0),
-      success = ifelse(
+      success = if_else(
         yards_gained >= .5 * distance & down == 1,
         1,
-        ifelse(
+        if_else(
           yards_gained >= .7 * distance & down == 2,
           1,
-          ifelse(
+          if_else(
             yards_gained >= distance & down == 3,
             1,
-            ifelse(yards_gained >= distance &
+            if_else(yards_gained >= distance &
                      down == 4, 1, 0)
           )
         )
       ),
-      success = ifelse(play_type %in% turnover_play_type, 0, success),
-      epa_success = ifelse(EPA > 0, 1, 0)
+      success = if_else(play_type %in% turnover_play_type, 0, success),
+      epa_success = if_else(EPA > 0, 1, 0)
     )
 
   return(pred_df)
@@ -283,14 +283,14 @@ calculate_epa <- function(clean_pbp_dat, ep_model=cfbscrapR:::ep_model, fg_model
 prep_pbp_df <- function(df) {
   df = df %>%
     mutate(
-      clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
+      clock.minutes = if_else(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
       Under_two = raw_secs <= 120,
-      half = ifelse(period <= 2, 1, 2),
+      half = if_else(period <= 2, 1, 2),
       new_id = gsub(pattern = unique(game_id), "", x = id_play),
       new_id = as.numeric(new_id),
-      log_ydstogo = ifelse(distance ==0,log(0.5),log(distance)),
-      down = ifelse(down == 5 &
+      log_ydstogo = if_else(distance ==0,log(0.5),log(distance)),
+      down = if_else(down == 5 &
                       str_detect(play_type, "Kickoff"),1, down)
     ) %>% filter(period <= 4, down > 0) %>%
     filter(!is.na(down),!is.na(raw_secs)) %>% rename(TimeSecsRem = raw_secs)
@@ -303,7 +303,7 @@ prep_pbp_df <- function(df) {
   # kickoff_inds = str_detect(df$play_type, "Kickoff")
   # df[kickoff_inds, "adj_yd_line"] =  100 - (100 * (1 - df[kickoff_inds, "coef"]) + (2 * df[kickoff_inds, "coef"] - 1) * df[kickoff_inds, "start_yardline"])
 
-  df = df %>% mutate(Goal_To_Go = ifelse(
+  df = df %>% mutate(Goal_To_Go = if_else(
     str_detect(play_type, "Field Goal"),
     distance >= (yards_to_goal - 17),
     distance >= yards_to_goal
@@ -339,7 +339,7 @@ epa_fg_probs <- function(dat, current_probs, fg_mod) {
       # 10 yards to go
       log_ydstogo = rep(log(10), n()),
       # Create Under_TwoMinute_Warning indicator
-      Under_two = ifelse(TimeSecsRem < 120,
+      Under_two = if_else(TimeSecsRem < 120,
                          TRUE, FALSE)
     )
   # add in the fg make prob into this
@@ -400,9 +400,9 @@ prep_df_epa2 <- function(dat) {
       start_yardline = as.numeric(start_yardline),
       start_yards_to_goal = as.numeric(start_yards_to_goal),
       end_yards_to_goal = as.numeric(end_yards_to_goal),
-      clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
+      clock.minutes = if_else(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
       raw_secs = clock.minutes * 60 + clock.seconds,
-      half = ifelse(period <= 2, 1, 2),
+      half = if_else(period <= 2, 1, 2),
       new_yardline = 0,
       new_down = 0,
       new_distance = 0
@@ -495,7 +495,7 @@ prep_df_epa2 <- function(dat) {
   dat = dat %>% ungroup() %>% group_by(game_id, half) %>%
     dplyr::arrange(id_play, .by_group = TRUE) %>%
     mutate(
-      turnover_indicator = ifelse(
+      turnover_indicator = if_else(
         play_type %in% defense_score_vec | play_type %in% turnover_vec |
           play_type %in% normalplay &
           yards_gained < distance & down == 4,
@@ -559,12 +559,12 @@ prep_df_epa2 <- function(dat) {
           penalty_offset ~ as.numeric(distance),
         #--penalty first down conversions, 10 or to goal
         play_type %in% penalty &
-          penalty_1st_conv ~ as.numeric(ifelse(yards_to_goal  - yards_gained <= 10,
+          penalty_1st_conv ~ as.numeric(if_else(yards_to_goal  - yards_gained <= 10,
                                                as.numeric(yards_to_goal),10)),
         #--penalty without first down conversion
         play_type %in% penalty & !penalty_declined &
           !penalty_1st_conv &
-          !penalty_offset ~ as.numeric(ifelse((yards_gained >= distance) &
+          !penalty_offset ~ as.numeric(if_else((yards_gained >= distance) &
                                 (yards_to_goal - yards_gained <= 10),
                                 as.numeric(yards_to_goal),10)),
       ##--normal plays
@@ -604,9 +604,9 @@ prep_df_epa2 <- function(dat) {
         play_type %in% turnover_vec ~ 100 - yards_to_goal + yards_gained
       )),
 
-      new_TimeSecsRem = ifelse(!is.na(lead(TimeSecsRem,order_by=id_play)),lead(TimeSecsRem,order_by=id_play),0),
-      new_log_ydstogo = ifelse(new_distance == 0, log(1),log(new_distance)),
-      new_Goal_To_Go = ifelse(new_yardline <= new_distance, TRUE, FALSE),
+      new_TimeSecsRem = if_else(!is.na(lead(TimeSecsRem,order_by=id_play)),lead(TimeSecsRem,order_by=id_play),0),
+      new_log_ydstogo = if_else(new_distance == 0, log(1),log(new_distance)),
+      new_Goal_To_Go = if_else(new_yardline <= new_distance, TRUE, FALSE),
       # new under two minute warnings
       new_Under_two = new_TimeSecsRem <= 120,
       end_half_game = 0
@@ -615,7 +615,7 @@ prep_df_epa2 <- function(dat) {
 
   #--Punt Plays--------------------------
   punt_plays = dat$play_type == "Punt"
-  touchback_punt = ifelse(!is.na(stringr::str_detect(dat$play_text,"touchback") & (punt_plays)),
+  touchback_punt = if_else(!is.na(stringr::str_detect(dat$play_text,"touchback") & (punt_plays)),
                           stringr::str_detect(dat$play_text,"touchback") & (punt_plays),FALSE)
   dat[punt_plays,"new_down"] = 1
   dat[punt_plays,"new_distance"] = 10
