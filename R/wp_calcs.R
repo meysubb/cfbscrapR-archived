@@ -25,7 +25,7 @@ create_wpa <- function(df, wp_model = cfbscrapR:::wp_model) {
   if (!all(col_nec %in% colnames(df))) {
     df = df %>% mutate(
       score_diff = offense_score - defense_score,
-      home_EPA = ifelse(offense_play == home, EPA,-EPA),
+      home_EPA = if_else(offense_play == home, EPA,-EPA),
       away_EPA = -home_EPA,
       ExpScoreDiff = score_diff + ep_before,
       half = as.factor(half),
@@ -56,8 +56,8 @@ wpa_calcs <- function(df) {
     group_by(half) %>%
     mutate(
       #-- ball changes hand----
-      change_of_poss = ifelse(offense_play == lead(offense_play, order_by = id_play), 0, 1),
-      change_of_poss = ifelse(is.na(change_of_poss), 0, change_of_poss)
+      change_of_poss = if_else(offense_play == lead(offense_play, order_by = id_play), 0, 1),
+      change_of_poss = if_else(is.na(change_of_poss), 0, change_of_poss)
     ) %>% ungroup() %>% arrange(id_play)
 
   df2 = df %>% mutate(
@@ -69,19 +69,19 @@ wpa_calcs <- function(df) {
   ) %>%
     mutate(
       # base wpa
-      end_of_half = ifelse(half == lead(half), 0, 1),
+      end_of_half = if_else(half == lead(half), 0, 1),
       lead_wp = dplyr::lead(wp),
       # account for turnover
       wpa_base = lead_wp - wp,
-      wpa_change = ifelse(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
-      wpa = ifelse(end_of_half == 1, 0, wpa_change),
-      home_wp_post = ifelse(offense_play == home,
+      wpa_change = if_else(change_of_poss == 1, (1 - lead_wp) - wp, wpa_base),
+      wpa = if_else(end_of_half == 1, 0, wpa_change),
+      home_wp_post = if_else(offense_play == home,
                             home_wp + wpa,
                             home_wp - wpa),
-      away_wp_post = ifelse(offense_play != home,
+      away_wp_post = if_else(offense_play != home,
                             away_wp + wpa,
                             away_wp - wpa),
-      adj_TimeSecsRem = ifelse(half == 1, 1800 + TimeSecsRem, TimeSecsRem)
+      adj_TimeSecsRem = if_else(half == 1, 1800 + TimeSecsRem, TimeSecsRem)
     )
   return(df2)
 }

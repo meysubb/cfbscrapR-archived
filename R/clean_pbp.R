@@ -108,9 +108,9 @@ clean_pbp_dat <- function(raw_df) {
 
   ## kickoff down adjustment
   raw_df = raw_df %>%
-    mutate(down = ifelse(down == 5 & str_detect(play_type, "Kickoff"), 1, down),
-           down = ifelse(down == 5 & str_detect(play_type, "Penalty"),1 , down),
-           half = ifelse(period <= 2, 1, 2))
+    mutate(down = if_else(down == 5 & str_detect(play_type, "Kickoff"), 1, down),
+           down = if_else(down == 5 & str_detect(play_type, "Penalty"),1 , down),
+           half = if_else(period <= 2, 1, 2))
 
   return(raw_df)
 }
@@ -120,10 +120,10 @@ add_timeout_cols <- function(play_df) {
     group_by(game_id, half) %>%
     arrange(id_play) %>%
     mutate(
-      timeout_called = ifelse(play_type %in% c("Timeout"), 1, 0),
-      timeout_team = ifelse(
+      timeout_called = if_else(play_type %in% c("Timeout"), 1, 0),
+      timeout_team = if_else(
         play_type %in% c("Timeout"),
-        ifelse(
+        if_else(
           !is.na(str_extract(play_text, "timeout (.+)")),
           str_extract(play_text, "timeout (.+)"),
           str_extract(play_text, "Timeout (.+)")
@@ -232,12 +232,12 @@ add_timeout_cols <- function(play_df) {
         timeout_team == "wyoming cowboys" ~ "wyoming",
         TRUE ~ timeout_team
       ),
-      home_timeout = ifelse(is.na(timeout_team), 0,
-                            ifelse(
+      home_timeout = if_else(is.na(timeout_team), 0,
+                            if_else(
                               str_detect(str_to_lower(home), fixed(timeout_team)) == TRUE, 1, 0
                             )),
-      away_timeout = ifelse(is.na(timeout_team), 0,
-                            ifelse(
+      away_timeout = if_else(is.na(timeout_team), 0,
+                            if_else(
                               str_detect(str_to_lower(away), fixed(timeout_team)) == TRUE, 1, 0
                             )),
       off_timeouts_rem_before = NA,
@@ -253,8 +253,8 @@ add_timeout_cols <- function(play_df) {
       home_timeout =
         case_when(
           timeout_called == 1 & home_timeout == 1 & away_timeout == 1 ~
-            ifelse(is.na(timeout_team), 0,
-                   ifelse(
+            if_else(is.na(timeout_team), 0,
+                   if_else(
                      str_detect(str_to_lower(home),
                                 paste0("^", timeout_team, "$")) ==
                        TRUE, 1, 0
@@ -264,8 +264,8 @@ add_timeout_cols <- function(play_df) {
       away_timeout =
         case_when(
           timeout_called == 1 & home_timeout == 1 & away_timeout == 1 ~
-            ifelse(is.na(timeout_team), 0,
-                   ifelse(
+            if_else(is.na(timeout_team), 0,
+                   if_else(
                      str_detect(str_to_lower(away),
                                 paste0("^", timeout_team, "$")) ==
                        TRUE, 1, 0
@@ -276,32 +276,32 @@ add_timeout_cols <- function(play_df) {
     mutate(
       home_timeouts_rem_after = 3 - cumsum(home_timeout),
       away_timeouts_rem_after = 3 - cumsum(away_timeout),
-      home_timeouts_rem_before = ifelse(
+      home_timeouts_rem_before = if_else(
         !is.na(lag(home_timeouts_rem_after, order_by = id_play)),
         lag(home_timeouts_rem_after, order_by = id_play),
         3
       ),
-      away_timeouts_rem_before = ifelse(
+      away_timeouts_rem_before = if_else(
         !is.na(lag(away_timeouts_rem_after, order_by = id_play)),
         lag(away_timeouts_rem_after, order_by = id_play),
         3
       ),
-      off_timeouts_rem_after = ifelse(
+      off_timeouts_rem_after = if_else(
         offense_play == home,
         home_timeouts_rem_after,
         away_timeouts_rem_after
       ),
-      def_timeouts_rem_after = ifelse(
+      def_timeouts_rem_after = if_else(
         defense_play == home,
         home_timeouts_rem_after,
         away_timeouts_rem_after
       ),
-      off_timeouts_rem_before = ifelse(
+      off_timeouts_rem_before = if_else(
         offense_play == home,
         home_timeouts_rem_before,
         away_timeouts_rem_before
       ),
-      def_timeouts_rem_before = ifelse(
+      def_timeouts_rem_before = if_else(
         defense_play == home,
         home_timeouts_rem_before,
         away_timeouts_rem_before
