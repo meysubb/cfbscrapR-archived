@@ -15,16 +15,12 @@
 clean_pbp_dat <- function(raw_df) {
   ## vectors
   #-- touchdowns----
-  td_e = str_detect(raw_df$play_text, "TD") |
-    str_detect(raw_df$play_text, "Touchdown") |
-    str_detect(raw_df$play_text, "TOUCHDOWN") |
-    str_detect(raw_df$play_text, "touchdown")
+  td_e = str_detect(raw_df$play_text, "TD|Touchdown|TOUCHDOWN|touchdown")
 
   #-- kicks/punts----
   kick_vec = str_detect(raw_df$play_text, "KICK") &
     !is.na(raw_df$play_text)
-  punt_vec = (str_detect(raw_df$play_text, "Punt") |
-                str_detect(raw_df$play_text, "punt")) &
+  punt_vec = str_detect(raw_df$play_text, "Punt|punt") &
     !is.na(raw_df$play_text)
   #-- fumbles----
   fumble_vec = str_detect(raw_df$play_text, "fumble")
@@ -70,17 +66,11 @@ clean_pbp_dat <- function(raw_df) {
 
   ## penalty detection-----
   #-- penalty in play text----
-  pen_text = str_detect(raw_df$play_text, "Penalty") |
-    str_detect(raw_df$play_text, "penalty") |
-    str_detect(raw_df$play_text, "PENALTY")
+  pen_text = str_detect(raw_df$play_text, "Penalty|penalty|PENALTY")
   #-- declined in play text----
-  pen_declined_text = str_detect(raw_df$play_text,"declined")|
-    str_detect(raw_df$play_text,"Declined")|
-    str_detect(raw_df$play_text,"DECLINED")
+  pen_declined_text = str_detect(raw_df$play_text,"declined|Declined|DECLINED")
   #--NO PLAY in play text----
-  pen_no_play_text = str_detect(raw_df$play_text,"no play")|
-    str_detect(raw_df$play_text,"No Play")|
-    str_detect(raw_df$play_text,"NO PLAY")
+  pen_no_play_text = str_detect(raw_df$play_text,"no play|No Play|NO PLAY")
   #--off-setting in play text----
   pen_offset_text = str_detect(raw_df$play_text,"off-setting")|
     str_detect(raw_df$play_text,"Off-Setting")|
