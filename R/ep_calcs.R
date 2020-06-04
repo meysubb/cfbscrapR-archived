@@ -387,24 +387,6 @@ prep_df_epa2 <- function(dat) {
     "Sack Touchdown",
     "Uncategorized Touchdown"
   )
-
-  dat = dat %>%
-    mutate_at(vars(clock.minutes, clock.seconds), ~ replace_na(., 0)) %>%
-    mutate(
-      yards_to_goal = as.numeric(yards_to_goal),
-      distance = distance,
-      yards_gained = as.numeric(yards_gained),
-      clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
-      raw_secs = clock.minutes * 60 + clock.seconds,
-      half = ifelse(period <= 2, 1, 2),
-      new_yardline = 0,
-      new_down = 0,
-      new_distance = 0
-      #log_ydstogo = 0
-    ) %>% group_by(game_id, half) %>%
-    dplyr::arrange(id_play, .by_group = TRUE)
-
-
   defense_score_vec = c(
     "Blocked Punt Touchdown",
     "Blocked Field Goal Touchdown",
@@ -465,6 +447,21 @@ prep_df_epa2 <- function(dat) {
     "Kickoff Return Touchdown",
     "Kickoff Touchdown"
   )
+  dat = dat %>%
+    mutate_at(vars(clock.minutes, clock.seconds), ~ replace_na(., 0)) %>%
+    mutate(
+      yards_to_goal = as.numeric(yards_to_goal),
+      distance = distance,
+      yards_gained = as.numeric(yards_gained),
+      clock.minutes = ifelse(period %in% c(1, 3), 15 + clock.minutes, clock.minutes),
+      raw_secs = clock.minutes * 60 + clock.seconds,
+      half = ifelse(period <= 2, 1, 2),
+      new_yardline = 0,
+      new_down = 0,
+      new_distance = 0
+      #log_ydstogo = 0
+    ) %>% group_by(game_id, half) %>%
+    dplyr::arrange(id_play, .by_group = TRUE)
 
   turnover_ind = dat$play_type %in% turnover_play_type
   dat$turnover = 0
@@ -477,7 +474,7 @@ prep_df_epa2 <- function(dat) {
   end_of_half_plays = !(dat$half == lead(dat$half,order_by = dat$id_play))
   # is specifically defined as a turnover
   turnover_play_check = dat$play_type %in% turnover_vec
-  # turnoversonly occur on actual change of offense
+  # turnovers only occur on actual change of offense
   # but not scoring plays
   # and not at the end of half.
   # Turnovers now capture downs, when there is a change of offense after a fourth down normal play.
