@@ -26,6 +26,8 @@ cfb_rankings <- function(year,week){
 
   raw_lst = fromJSON(url) %>% purrr::flatten()
 
-  polls_info = raw_lst$polls %>% tidyr::unnest() %>%
+  polls_info = raw_lst$polls %>% tidyr::unnest(cols = c(ranks)) %>%
     group_by(poll) %>% arrange(rank,.by_group=TRUE) %>% ungroup()
+  
+  return(polls_info)
 }
