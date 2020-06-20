@@ -1,9 +1,8 @@
 #' Gets CFB recruiting information for a single year with filters available for team,
 #' recruit type, state and position.
 #'
-#' If two years are provided, get cfb recruiting information based on position groups during that
-#' time period for all FBS teams.
-#'
+#' If you would like to get cfb recruiting information based on position groups during a
+#' time period for all FBS teams, please see cfb_position_recruiting function.
 #'
 #' @param year Year (*Integer*, 4 digits YYYY, required)
 #' @param team Team information (*String* optional)
