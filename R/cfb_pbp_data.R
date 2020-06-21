@@ -1,7 +1,6 @@
 #' Extract CFB (D1) Play by Play Data - For both plays and drives
 #'
 #'
-#'
 #' Extracts raw game by game data. Data comes from https://api.collegefootballdata.com
 #' @param season_type Select Season Type (regular,postseason,both)
 #' @param year Select year, (example: 2018)

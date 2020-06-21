@@ -28,9 +28,6 @@ cfb_pbp_data(
 \item{drive}{Enter anything, and you will get general drive infoo}
 }
 \description{
-Extract CFB (D1) Play by Play Data - For both plays and drives
-}
-\details{
 Extracts raw game by game data. Data comes from https://api.collegefootballdata.com
 }
 \examples{

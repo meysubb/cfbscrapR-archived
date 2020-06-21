@@ -1,14 +1,12 @@
 ---
 title: "Introduction to College Football Analytics with cfbscrapR"
 author: "Parker Fleming | @statsowar"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{intro}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 Hello, friends.
 
 You, like me, might be a big college football fan who is interested in statistics and analytics, wanting to get into the game for yourself. This simple tutorial is just the way to do that!
@@ -78,11 +76,11 @@ We're going to pull the data, clean it, then select some relevant variables, and
 Note in the code how we defined what pbp_2019 is: we used the little arrow. If you're on mac, you can press option and the dash key to pull one of those little guys up. That's just R's fun way of saying "name that thing this".
 
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 easypackages::libraries('tidyverse', 'cfbscrapR', 'ggimage', 'gt')
 ```
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 pbp_2019 <- cfb_pbp_data(year=2019, season_type = "regular", week=NULL, epa_wpa = TRUE)
 ```
 
@@ -93,7 +91,7 @@ Now, we have the entire season's worth of play-by-play data stored in an object 
 
 Let's pull the game data, using the ```cfb_game_info()``` function, and merge the two. Then, we'll make use of the ```filter``` and ```mutate``` functions from the ```tidyverse```. 
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 #Game level data
 games_19 <- cfb_game_info(2019)
 
@@ -125,7 +123,7 @@ But we won't stop there! The beauty of the pipe is that we can do multiple opera
   iii. ```success```: We use the same ```ifelse()``` logic to create a binary variable that indicates whether a play was successful or not, again, as defined by Bill C. 
 
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 #Create Garbage time filter, eliminate FCS games, 
 #filter for only rushes and passes, create success variable
 pbp <- plays19 %>% filter(rush == 1| pass == 1) %>% 
@@ -192,14 +190,14 @@ We can easily do the defensive side of the ball as well, grouping plays instead 
 
 For the tutorial, I've included the ```head()``` function as a quick way to look at the top values of our data. In your console, though, with the ```view()``` command, you can pull up the data in a traditional spreadsheet kind of format, which can help you parse through and see what you're working with, or see results you've created.
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 offense <- plays %>% group_by(offense_play) %>% 
   summarise(epa.pass.off = mean(EPA[pass==1]), epa.rush.off = mean(EPA[rush==1]))
 defense <- plays %>% group_by(defense_play) %>% 
   summarise(epa.pass.def = mean(EPA[pass==1]), epa.pass.def = mean(EPA[rush==1]))
 ```
 
-```{r}
+```{r,message=FALSE,warning=FALSE}
 team.epa <- left_join(offense, defense, by = c("offense_play" = "defense_play")) 
 head(team.epa)
 ```
@@ -356,28 +354,28 @@ Let me know of any work you do, resources you can think of, or code you want to 
 
 *** 
 Other Great Resources
-* [Tom's Cookbook for Better Viz](https://jthomasmock.github.io/nfl_plotting_cookbook/)
-* [R For Data Science](https://r4ds.had.co.nz/)
-* [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
-* GOOGLE: there are a million other outside resources that are so valuable. Don't pay for anything!
-* Books I'd Recommend:
-* MATHLETICS by Wayne L. Winson
-* Introductory Econometrics: A Modern Approach by Jeffry Wooldridge
-* Analyzing Baseball Data with R by Baumer, Albert, and Marchi
-* Introduction to Statistical Learning with Applications in R, by James, Witten, Hastie, and Tibshirani
+* [Tom's Cookbook for Better Viz](https://jthomasmock.github.io/nfl_plotting_cookbook/)  
+* [R For Data Science](https://r4ds.had.co.nz/)  
+* [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)  
+* GOOGLE: there are a million other outside resources that are so valuable. Don't pay for anything!  
+* Books I'd Recommend:  
+* MATHLETICS by Wayne L. Winson  
+* Introductory Econometrics: A Modern Approach by Jeffry Wooldridge  
+* Analyzing Baseball Data with R by Baumer, Albert, and Marchi  
+* Introduction to Statistical Learning with Applications in R, by James, Witten, Hastie, and Tibshirani  
 ## Glossary of terms and functions:
 cfbscrapR: the R package that helps you get the college football data. Documentation can be found here:
 ### Functions in cfbscrapR:
-* cfb_pbp_data() gets you the play by play for a given week or team. Can loop over this to pull the whole season. If you include 'drives=TRUE', you can get the drive data.
-* cfb_game_info() gets you the home team, away team, game score, and more info about games.
-* plot_pbp_sequencing() and plot_wpa() are both built-in graphics you can play with. See documentation.
-* tidyverse: the R data science package that helps you wrangle and analyze data.
+* cfb_pbp_data() gets you the play by play for a given week or team. Can loop over this to pull the whole season. If you include 'drives=TRUE', you can get the drive data.  
+* cfb_game_info() gets you the home team, away team, game score, and more info about games.  
+* plot_pbp_sequencing() and plot_wpa() are both built-in graphics you can play with. See documentation.   
+* tidyverse: the R data science package that helps you wrangle and analyze data.  
 Functions we used in the tidyverse:
-* mutate(): creates new variables
-* group_by() and summarise(): groups observation and calculates summary statistics
-* filter(): keeps observations based on certain conditions (remember to use ==)
-* left_join(): takes one dataframe and merges it with another
-* head() tail() glimpse() and levels(): all help you inspect the data
-* ggplot() and geom_point(): graphing functions that set up a graph and plots scatter plots
-(gt: a nice package for getting publication-quality tables
-see Tom's Cookbook to help tweak gt() with all sorts of features.
+* mutate(): creates new variables  
+* group_by() and summarise(): groups observation and calculates summary statistics  
+* filter(): keeps observations based on certain conditions (remember to use ==)  
+* left_join(): takes one dataframe and merges it with another  
+* head() tail() glimpse() and levels(): all help you inspect the data  
+* ggplot() and geom_point(): graphing functions that set up a graph and plots scatter plots  
+(gt: a nice package for getting publication-quality tables  
+see Tom's Cookbook to help tweak gt() with all sorts of features.  

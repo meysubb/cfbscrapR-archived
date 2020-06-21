@@ -16,5 +16,7 @@ Current support only for D1
 }
 \examples{
 
+
+cfb_team(conference="SEC")
 }
 \keyword{Teams}
