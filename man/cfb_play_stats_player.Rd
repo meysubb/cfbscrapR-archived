@@ -7,9 +7,7 @@
 cfb_play_stats_player(gameId)
 }
 \arguments{
-\item{gameId}{Game ID
-
-#' @keywords internal}
+\item{gameId}{Game ID}
 }
 \description{
 Information describes the players involved in the play
@@ -23,3 +21,6 @@ gameId can be extracted from cfb_game_info
 
 cfb_play_stats_player(401110723)
 }
+\keyword{-}
+\keyword{PBP}
+\keyword{Player}

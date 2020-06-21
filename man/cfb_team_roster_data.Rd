@@ -15,4 +15,5 @@ Extracts raw game by game data.
 \examples{
 
 }
-\keyword{internal}
+\keyword{Roster}
+\keyword{Team}

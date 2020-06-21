@@ -5,7 +5,7 @@
 #' @param year Year
 #' @param week Week
 #'
-#'#' @keywords internal
+#' @keywords CFB Rankings
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom purrr "flatten"
 #' @importFrom tidyr "unnest"

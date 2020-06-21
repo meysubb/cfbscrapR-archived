@@ -28,4 +28,4 @@ Extracts raw game by game data.
 \examples{
 
 }
-\keyword{internal}
+\keyword{Play-by-Play}

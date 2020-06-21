@@ -17,4 +17,4 @@ Current support only for D1
 \examples{
 
 }
-\keyword{internal}
+\keyword{Teams}

@@ -3,7 +3,7 @@
 #'
 #' @param df Play-by-Play data frame (can be retrieved from cfb_pbp_data)
 
-#' @keywords internal
+#' @keywords Plot WPA
 #' @import dplyr
 #' @import ggplot2
 #' @import stringr

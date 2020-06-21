@@ -27,4 +27,4 @@ cfb_srs_ranking(2019,team="Texas")
 
 cfb_srs_ranking(year=2018,conference='SEC')
 }
-\keyword{internal}
+\keyword{SRS}

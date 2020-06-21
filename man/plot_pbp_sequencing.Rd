@@ -21,4 +21,5 @@ df = cfb_pbp_data(year=2019,week=9,team='Texas A&M')
 plot_pbp_sequencing(df)
 
 }
-\keyword{internal}
+\keyword{PbP}
+\keyword{Plot}

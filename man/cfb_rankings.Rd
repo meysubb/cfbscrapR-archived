@@ -9,9 +9,7 @@ cfb_rankings(year, week)
 \arguments{
 \item{year}{Year}
 
-\item{week}{Week
-
-#' @keywords internal}
+\item{week}{Week}
 }
 \description{
 Postseason polls are after Week 13
@@ -22,3 +20,5 @@ cfb_rankings(2018,1)
 
 cfb_rankings(2018,14)
 }
+\keyword{CFB}
+\keyword{Rankings}

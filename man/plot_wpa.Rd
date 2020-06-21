@@ -22,4 +22,5 @@ home_color <- c(BU="#003015")
 away_color <- c(OU="#841617")
 plot_wpa(df,away_color,home_color,winner="away")
 }
-\keyword{internal}
+\keyword{Plot}
+\keyword{WPA}

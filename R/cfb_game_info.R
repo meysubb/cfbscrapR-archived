@@ -10,7 +10,7 @@
 #' @param team Team (optional, D1 Team)
 #' @param conference Conference (option, select an appropriate conference)
 #'
-#' @keywords internal
+#' @keywords Game Info
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom assertthat "assert_that"
 #' @export

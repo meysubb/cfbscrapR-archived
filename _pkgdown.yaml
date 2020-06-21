@@ -1,0 +1,43 @@
+template:
+  params:
+    bootswatch: cosmo
+
+url: http://meysubb.github.io/cfbscrapR
+
+
+authors:
+  Meeyappan Subbaiah:
+  href: https://twitter.com/msubbaiah1
+
+
+home:
+  links:
+  - text: Suggestions/Issues
+    href: https://github.com/meysubb/cfbscrapR/issues
+
+
+navbar:
+  title: "cfbscrapR"
+  left:
+    - text: "Vignettes"
+      href: articles/index.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: "News"
+      href: news/index.html
+  right:
+   - icon: fa-twitter
+     href: https://twitter.com/cfbscrapR
+   - icon: fa-github
+     href: https://github.com/meysubb/cfbscrapR
+
+reference:
+- title: CFB Data
+- subtitle: Data from CFB API
+  desc: Data Accquisition (Inject with our EP/WP models)
+- contents:
+  - starts_with("cfb")
+- subtitle: Plot
+  desc: Plot Functions
+  contents:
+  - starts_with("plot")

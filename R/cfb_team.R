@@ -3,7 +3,7 @@
 #'
 #'
 #' @param conference Conference (Select a valid conference, D1 football)
-#' @keywords internal
+#' @keywords Teams
 #' @importFrom assertthat "assert_that"
 #' @importFrom jsonlite "fromJSON"
 #' @export

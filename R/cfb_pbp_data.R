@@ -9,7 +9,7 @@
 #' @param team Select team name (example: Texas, Texas A&M, Clemson)
 #' @param play_type Select play type (example: see the cfb_play_type_df)
 #' @param drive Enter anything, and you will get general drive infoo
-#' @keywords internal
+#' @keywords Play-by-Play
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples

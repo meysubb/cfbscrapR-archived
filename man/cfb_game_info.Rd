@@ -32,4 +32,5 @@ cfb_game_info(2018,conference='SEC')
 cfb_game_info(2018,team="Texas A&M")
 
 }
-\keyword{internal}
+\keyword{Game}
+\keyword{Info}
