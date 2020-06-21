@@ -365,8 +365,10 @@ Other Great Resources:
 * MATHLETICS by Wayne L. Winson  
 * Introductory Econometrics: A Modern Approach by Jeffry Wooldridge  
 * Analyzing Baseball Data with R by Baumer, Albert, and Marchi  
-* Introduction to Statistical Learning with Applications in R, by James, Witten, Hastie, and Tibshirani  
-## Glossary of terms and functions 
+* Introduction to Statistical Learning with Applications in R, by James, Witten, Hastie, and Tibshirani
+
+
+## Glossary of terms and functions
 
 cfbscrapR: the R package that helps you get the college football data. Documentation can be found here:
 
