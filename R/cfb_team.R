@@ -9,6 +9,8 @@
 #' @export
 #' @examples
 #'
+#'
+#' cfb_team(conference="SEC")
 
 cfb_team <- function(conference=NULL,fbs_all=T,year=NULL) {
   if(!is.null(conference)){

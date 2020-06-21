@@ -7,6 +7,8 @@
 #' @export
 #' @examples
 #'
+#' cfb_team_roster_data("Florida State")
+#'
 
 cfb_team_roster_data <- function(team){
   options(stringsAsFactors = FALSE)
