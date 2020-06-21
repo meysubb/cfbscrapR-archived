@@ -104,9 +104,10 @@ Above, we pulled 2019 game data from the API into an object called "games_19", a
 ## Clean the Data
 
 Before we break down what we did to create the pbp object, we need to discuss two things:
-1. Filtering on conditions: We will use the double equality (==) to identify conditions we need to meet for our filter function. We can also use !=, "not equals", to select values on that condition (i.e. offense_play != "TCU" would remove TCU from the data), and we can use the standard greater than > and less than <. You might have to stop and think a bit before you write your filter function, so just make sure you know what it is you are actually selecting.
 
-2. the *pipe*: %>% is the magrittr pipe. The pipe is extremely handy. Instead of us having to type a function and select the data we want to apply that function to over and over again, the pipe tells R what to do in the structure of : "get this thing and then do this to it."
+1. Filtering on conditions: We will use the double equality (==) to identify conditions we need to meet for our filter function. We can also use !=, "not equals", to select values on that condition (i.e. offense_play != "TCU" would remove TCU from the data), and we can use the standard greater than > and less than <. You might have to stop and think a bit before you write your filter function, so just make sure you know what it is you are actually selecting.   
+
+2. the *pipe*: %>% is the magrittr pipe. The pipe is extremely handy. Instead of us having to type a function and select the data we want to apply that function to over and over again, the pipe tells R what to do in the structure of : "get this thing and then do this to it."   
 
 I'm naming our dataset of play by play data filtered "pbp". I don't like to overwrite my data once I've imported it, so I'm going to give it a new name. That way, if I mess something up along the way, I can go back to the start and clean up without too much hassle.
 
@@ -115,12 +116,13 @@ We'll use the indicator variables "rush" and "pass" to select every play categor
 Also note we use the | symbol to denote "or" in our filter function. We'll filter the data for any observations that are runs (rush == 1) or passes (pass == 1), and store it in a new object called plays.
 
 But we won't stop there! The beauty of the pipe is that we can do multiple operations, all strung together. So, in the code below, we'll create a new object called "pbp". To create this object, we'll do three things: 
-1. Take plays19, remove all plays that aren't rushes or passes: ```filter(rush == 1 | pass == 1)``` AND THEN
-2. Remove all FCS teams. This is a personal preference of mine, and if you'd like to leave those in the data, you can certainly remove this line! It's a good way to illustrate how you'd do this, though. By using filter(), I tell R to select all observations that are *not* (!) missing the variable home_conference or away_conference. As all FBS teams have a conference in the data, this will remove all FCS teams. **Note**: is.na(x) means "is missing variable x", so !is.na(x) means "is not missing variable x."
-3. Create new variables! ```mutate()``` is R's weird way of saying "make a new variable!" So, we'll create three new variables: 
-  i. ```abs_diff``` is the absolute value of the score difference, created using the abs() function. This variable helps us define the garbage time filter.
-  ii. ```garbage``` is an indicator variable for whether a play is in garbage time, as defined by our friend Bill Connelly. Garbage time is when the score difference is greater than 43 in the first quarter, 37 in the second quarter, 27 in the third quarter, and 22 in the fourth quarter. To create this variable, we use the ```ifelse()```, which takes three arguments: a condition, yes, and no. ifelse basically says "if this condition is met, then make this variable this value, or do something else." We've strung multiple ifelse() conditions together to cover all of our bases.
-  iii. ```success```: We use the same ```ifelse()``` logic to create a binary variable that indicates whether a play was successful or not, again, as defined by Bill C. 
+
+1. Take plays19, remove all plays that aren't rushes or passes: ```filter(rush == 1 | pass == 1)``` AND THEN  
+2. Remove all FCS teams. This is a personal preference of mine, and if you'd like to leave those in the data, you can certainly remove this line! It's a good way to illustrate how you'd do this, though. By using filter(), I tell R to select all observations that are *not* (!) missing the variable home_conference or away_conference. As all FBS teams have a conference in the data, this will remove all FCS teams. **Note**: is.na(x) means "is missing variable x", so !is.na(x) means "is not missing variable x."  
+3. Create new variables! ```mutate()``` is R's weird way of saying "make a new variable!" So, we'll create three new variables:    
+  i. ```abs_diff``` is the absolute value of the score difference, created using the abs() function. This variable helps us define the garbage time filter.  
+  ii. ```garbage``` is an indicator variable for whether a play is in garbage time, as defined by our friend Bill Connelly. Garbage time is when the score difference is greater than 43 in the first quarter, 37 in the second quarter, 27 in the third quarter, and 22 in the fourth quarter. To create this variable, we use the ```ifelse()```, which takes three arguments: a condition, yes, and no. ifelse basically says "if this condition is met, then make this variable this value, or do something else." We've strung multiple ifelse() conditions together to cover all of our bases.  
+  iii. ```success```: We use the same ```ifelse()``` logic to create a binary variable that indicates whether a play was successful or not, again, as defined by Bill C.   
 
 
 ```{r,message=FALSE,warning=FALSE}
@@ -353,7 +355,8 @@ This is just a little taste of what you can do in college football data, thanks 
 Let me know of any work you do, resources you can think of, or code you want to share, then I'll link to it below!
 
 *** 
-Other Great Resources
+
+Other Great Resources:  
 * [Tom's Cookbook for Better Viz](https://jthomasmock.github.io/nfl_plotting_cookbook/)  
 * [R For Data Science](https://r4ds.had.co.nz/)  
 * [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)  
@@ -363,14 +366,19 @@ Other Great Resources
 * Introductory Econometrics: A Modern Approach by Jeffry Wooldridge  
 * Analyzing Baseball Data with R by Baumer, Albert, and Marchi  
 * Introduction to Statistical Learning with Applications in R, by James, Witten, Hastie, and Tibshirani  
-## Glossary of terms and functions:
+## Glossary of terms and functions 
+
 cfbscrapR: the R package that helps you get the college football data. Documentation can be found here:
-### Functions in cfbscrapR:
+
+### Functions in cfbscrapR
+
 * cfb_pbp_data() gets you the play by play for a given week or team. Can loop over this to pull the whole season. If you include 'drives=TRUE', you can get the drive data.  
 * cfb_game_info() gets you the home team, away team, game score, and more info about games.  
 * plot_pbp_sequencing() and plot_wpa() are both built-in graphics you can play with. See documentation.   
-* tidyverse: the R data science package that helps you wrangle and analyze data.  
-Functions we used in the tidyverse:
+tidyverse: the R data science package that helps you wrangle and analyze data.  
+
+### Functions we used in the tidyverse
+
 * mutate(): creates new variables  
 * group_by() and summarise(): groups observation and calculates summary statistics  
 * filter(): keeps observations based on certain conditions (remember to use ==)  
