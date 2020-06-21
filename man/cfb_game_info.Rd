@@ -2,17 +2,20 @@
 % Please edit documentation in R/cfb_game_info.R
 \name{cfb_game_info}
 \alias{cfb_game_info}
-\title{Get information from games (depending on a bunch of parameters)
-1 - Game info for all games that year
-2 - Game infos for a specific week of games in a year
-3 - Game info for one team that year (or a specific week)
-4 - Game info for specific conference that year (or a specific week)}
+\title{Get information from games}
 \usage{
-cfb_game_info(year, season_type = "regular", week = NULL,
-  team = NULL, conference = NULL)
+cfb_game_info(
+  year,
+  season_type = "regular",
+  week = NULL,
+  team = NULL,
+  conference = NULL
+)
 }
 \arguments{
 \item{year}{Year}
+
+\item{season_type}{Select Season Type (regular,postseason,both)}
 
 \item{week}{Week (optional, keep this numeric)}
 
@@ -21,7 +24,10 @@ cfb_game_info(year, season_type = "regular", week = NULL,
 \item{conference}{Conference (option, select an appropriate conference)}
 }
 \description{
-#' @param season_type Select Season Type (regular,postseason,both)
+1 - Game info for all games that year
+2 - Game infos for a specific week of games in a year
+3 - Game info for one team that year (or a specific week)
+4 - Game info for specific conference that year (or a specific week)
 }
 \examples{
 

@@ -14,6 +14,10 @@
 #' @export
 #' @examples
 #'
+#' cfb_pbp_data(year=2019,week=9,team='Texas A&M')
+#'
+#'
+#' cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 
 cfb_pbp_data <- function(year,
                          season_type = 'regular',

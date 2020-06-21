@@ -16,7 +16,6 @@ Postseason polls are after Week 13
 }
 \examples{
 
-cfb_rankings(2018,1)
 
 cfb_rankings(2018,14)
 }

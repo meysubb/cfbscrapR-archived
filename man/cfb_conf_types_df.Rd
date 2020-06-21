@@ -4,14 +4,16 @@
 \name{cfb_conf_types_df}
 \alias{cfb_conf_types_df}
 \title{College Football Conference}
-\format{A data frame with 11 rows and 4 variables:
+\format{
+A data frame with 11 rows and 4 variables:
 \describe{
   \item{id}{Referencing conference id}
   \item{name}{Conference name}
   \item{short_name}{Short name for Conference}
   \item{abberivation}{Conference abberivation}
   ...
-}}
+}
+}
 \source{
 \url{https://api.collegefootballdata.com}
 }

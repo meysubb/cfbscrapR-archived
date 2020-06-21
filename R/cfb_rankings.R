@@ -13,7 +13,6 @@
 #' @export
 #' @examples
 #'
-#' cfb_rankings(2018,1)
 #'
 #' cfb_rankings(2018,14)
 
@@ -28,4 +27,5 @@ cfb_rankings <- function(year,week){
 
   polls_info = raw_lst$polls %>% tidyr::unnest() %>%
     group_by(poll) %>% arrange(rank,.by_group=TRUE) %>% ungroup()
+  return(polls_info)
 }
