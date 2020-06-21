@@ -26,7 +26,7 @@ plot_pbp_sequencing <- function(df){
     filter(row_number() == (n())) %>% ungroup() %>%
     mutate(
       y_max = max(play_num) + 5,
-      score_text = ifelse(scoring == TRUE, score_text, NA)
+      score_text = ifelse(drive_scoring == TRUE, score_text, NA)
     )
 
   nd_id = clean_drive_info$new_drive_id

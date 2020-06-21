@@ -1,10 +1,12 @@
-#' Get information from games (depending on a bunch of parameters)
+#' Get information from games
+#'
+#'
 #' 1 - Game info for all games that year
 #' 2 - Game infos for a specific week of games in a year
 #' 3 - Game info for one team that year (or a specific week)
 #' 4 - Game info for specific conference that year (or a specific week)
 #'
-#' #' @param season_type Select Season Type (regular,postseason,both)
+#' @param season_type Select Season Type (regular,postseason,both)
 #' @param year Year
 #' @param week Week (optional, keep this numeric)
 #' @param team Team (optional, D1 Team)
