@@ -5,7 +5,7 @@
 #' @param team Team information (optional)
 #' @param confefence Conference Abbreivation - S&P+ information by confderence
 #'
-#' @keywords internal
+#' @keywords SRS
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom assertthat "assert_that"
 #' @export

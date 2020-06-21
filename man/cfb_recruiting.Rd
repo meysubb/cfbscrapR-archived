@@ -25,4 +25,4 @@ cfb_recruiting(2018,team="Texas")
 
 cfb_recruiting(2016,year2=2018)
 }
-\keyword{internal}
+\keyword{Recruiting}

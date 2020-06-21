@@ -20,4 +20,5 @@ cfb_team_talent()
 
 cfb_team_talent(year=2018)
 }
-\keyword{internal}
+\keyword{Team}
+\keyword{talent}

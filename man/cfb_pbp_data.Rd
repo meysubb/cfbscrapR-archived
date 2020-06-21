@@ -2,12 +2,17 @@
 % Please edit documentation in R/cfb_pbp_data.R
 \name{cfb_pbp_data}
 \alias{cfb_pbp_data}
-\title{Extract CFB Play by Play Data - For both plays and drives
-This is only for D1 football
-Data comes from https://api.collegefootballdata.com}
+\title{Extract CFB (D1) Play by Play Data - For both plays and drives}
 \usage{
-cfb_pbp_data(year, season_type = "regular", week = 1, team = NULL,
-  play_type = NULL, drive = NULL, epa_wpa = FALSE)
+cfb_pbp_data(
+  year,
+  season_type = "regular",
+  week = 1,
+  team = NULL,
+  play_type = NULL,
+  drive = NULL,
+  epa_wpa = FALSE
+)
 }
 \arguments{
 \item{year}{Select year, (example: 2018)}
@@ -23,9 +28,13 @@ cfb_pbp_data(year, season_type = "regular", week = 1, team = NULL,
 \item{drive}{Enter anything, and you will get general drive infoo}
 }
 \description{
-Extracts raw game by game data.
+Extracts raw game by game data. Data comes from https://api.collegefootballdata.com
 }
 \examples{
 
+cfb_pbp_data(year=2019,week=9,team='Texas A&M')
+
+
+cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 }
-\keyword{internal}
+\keyword{Play-by-Play}
