@@ -28,4 +28,4 @@ cfb_sp_ranking(conference='SEC')
 
 cfb_sp_ranking(year=2018,conference='SEC')
 }
-\keyword{internal}
+\keyword{SP+}

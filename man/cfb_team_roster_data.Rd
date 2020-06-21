@@ -14,5 +14,8 @@ Extracts raw game by game data.
 }
 \examples{
 
+cfb_team_roster_data("Florida State")
+
 }
-\keyword{internal}
+\keyword{Roster}
+\keyword{Team}

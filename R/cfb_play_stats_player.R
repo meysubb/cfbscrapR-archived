@@ -8,7 +8,7 @@
 #'
 #'@param gameId Game ID
 #'
-#'#' @keywords internal
+#' @keywords Player - PBP
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom tidyr "pivot_wider"
 #' @importFrom tidyr "unite"

@@ -3,7 +3,7 @@
 #'
 #' Extracts team talent rankings as sourced from 247 rankings
 #' @param year Year
-#' @keywords internal
+#' @keywords Team talent
 #' @importFrom jsonlite "fromJSON"
 #' @importFrom assertthat "assert_that"
 #' @export

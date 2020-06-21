@@ -2,10 +2,12 @@
 #'
 #' Extracts raw game by game data.
 #' @param team Team (Select a valid team, D1 football)
-#' @keywords internal
+#' @keywords Team Roster
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples
+#'
+#' cfb_team_roster_data("Florida State")
 #'
 
 cfb_team_roster_data <- function(team){

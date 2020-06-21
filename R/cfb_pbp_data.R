@@ -1,19 +1,22 @@
-#' Extract CFB Play by Play Data - For both plays and drives
-#' This is only for D1 football
-#' Data comes from https://api.collegefootballdata.com
+#' Extract CFB (D1) Play by Play Data - For both plays and drives
 #'
-#' Extracts raw game by game data.
+#'
+#' Extracts raw game by game data. Data comes from https://api.collegefootballdata.com
 #' @param season_type Select Season Type (regular,postseason,both)
 #' @param year Select year, (example: 2018)
 #' @param week Select week, this is optional (also numeric)
 #' @param team Select team name (example: Texas, Texas A&M, Clemson)
 #' @param play_type Select play type (example: see the cfb_play_type_df)
 #' @param drive Enter anything, and you will get general drive infoo
-#' @keywords internal
+#' @keywords Play-by-Play
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples
 #'
+#' cfb_pbp_data(year=2019,week=9,team='Texas A&M')
+#'
+#'
+#' cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 
 cfb_pbp_data <- function(year,
                          season_type = 'regular',
