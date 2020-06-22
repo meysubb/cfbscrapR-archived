@@ -1,5 +1,5 @@
 Package: cfbscrapR
-Title: What the Package Does (one line, title case)
+Title: R Package for Scraping and Aggregating CFB Data
 Version: 0.1.4
 Authors@R: c(person("Meyappan", "Subbaiah", email = "meysubb@gmail.com", role = c("aut", "cre")),
              person("Saiem", "Gilani", email = "saiem.gilani@gmail.com", role = c("ctb")),
@@ -21,4 +21,6 @@ Imports:
     assertthat,
     jsonlite,
     purrr
-RoxygenNote: 6.1.1.9000
+RoxygenNote: 7.1.0
+Suggests: knitr, rmarkdown 
+VignetteBuilder: knitr

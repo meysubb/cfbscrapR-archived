@@ -3,12 +3,14 @@
 #'
 #'
 #' @param conference Conference (Select a valid conference, D1 football)
-#' @keywords internal
+#' @keywords Teams
 #' @importFrom assertthat "assert_that"
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples
 #'
+#'
+#' cfb_team(conference="SEC")
 
 cfb_team <- function(conference=NULL,fbs_all=T,year=NULL) {
   if(!is.null(conference)){

@@ -14,7 +14,7 @@
 #'  * Defense: 'CB', 'S', 'OLB', 'ILB', 'WDE', 'SDE', 'DT'
 #'  * Special Teams: 'K', 'P'
 #'
-#' @keywords internal
+#' @keywords Recruiting
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples

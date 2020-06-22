@@ -16,9 +16,10 @@ Plot the Drive/PBP Sequencing
 
 
 
-df = cfb_pbp_data(year=2019,week=9,team='Texas A&M')
+df = cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 
 plot_pbp_sequencing(df)
 
 }
-\keyword{internal}
+\keyword{PbP}
+\keyword{Plot}

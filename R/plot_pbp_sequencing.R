@@ -3,7 +3,7 @@
 #'
 #' @param df Play-by-Play data frame (can be retrieved from cfb_pbp_data)
 
-#' @keywords internal
+#' @keywords Plot PbP
 #' @import dplyr
 #' @import ggplot2
 #' @import stringr
@@ -13,7 +13,7 @@
 #'
 #'
 #'
-#' df = cfb_pbp_data(year=2019,week=9,team='Texas A&M')
+#' df = cfb_pbp_data(year=2019,week=9,team='Texas A&M',epa_wpa=T)
 #'
 #' plot_pbp_sequencing(df)
 #'
@@ -26,7 +26,7 @@ plot_pbp_sequencing <- function(df){
     filter(row_number() == (n())) %>% ungroup() %>%
     mutate(
       y_max = max(play_num) + 5,
-      score_text = ifelse(scoring == TRUE, score_text, NA)
+      score_text = ifelse(drive_scoring == TRUE, score_text, NA)
     )
 
   nd_id = clean_drive_info$new_drive_id
