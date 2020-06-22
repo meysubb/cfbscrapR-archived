@@ -1,3 +1,5 @@
+#' CFB Recruiting Information - Position Groups
+#'
 #' If only start_year is provided, function will get cfb recruiting information based
 #' on position groups during that year for all FBS teams.
 #'
@@ -6,7 +8,6 @@
 #' @param team Team information (*String* optional)
 #' @param conference Conference to filter on, abbreviated (*String* optional)
 #'
-#' @keywords internal
 #' @importFrom jsonlite "fromJSON"
 #' @export
 #' @examples
