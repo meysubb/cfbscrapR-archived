@@ -76,11 +76,11 @@ We're going to pull the data, clean it, then select some relevant variables, and
 Note in the code how we defined what pbp_2019 is: we used the little arrow. If you're on mac, you can press option and the dash key to pull one of those little guys up. That's just R's fun way of saying "name that thing this".
 
 
-```{r,message=FALSE,warning=FALSE}
+```{r easy,message=FALSE,warning=FALSE}
 easypackages::libraries('tidyverse', 'cfbscrapR', 'ggimage', 'gt')
 ```
 
-```{r,message=FALSE,warning=FALSE}
+```{r pbp_pull,message=FALSE,warning=FALSE}
 pbp_2019 <- cfb_pbp_data(year=2019, season_type = "regular", week=NULL, epa_wpa = TRUE)
 ```
 
@@ -91,7 +91,7 @@ Now, we have the entire season's worth of play-by-play data stored in an object 
 
 Let's pull the game data, using the ```cfb_game_info()``` function, and merge the two. Then, we'll make use of the ```filter``` and ```mutate``` functions from the ```tidyverse```. 
 
-```{r,message=FALSE,warning=FALSE}
+```{r game_info,message=FALSE,warning=FALSE}
 #Game level data
 games_19 <- cfb_game_info(2019)
 
@@ -125,7 +125,7 @@ But we won't stop there! The beauty of the pipe is that we can do multiple opera
   iii. ```success```: We use the same ```ifelse()``` logic to create a binary variable that indicates whether a play was successful or not, again, as defined by Bill C.   
 
 
-```{r,message=FALSE,warning=FALSE}
+```{r gtfilter,message=FALSE,warning=FALSE}
 #Create Garbage time filter, eliminate FCS games, 
 #filter for only rushes and passes, create success variable
 pbp <- plays19 %>% filter(rush == 1| pass == 1) %>% 
@@ -144,7 +144,7 @@ Now we have a clean dataset of every rush and pass that happened in 2019. (Quick
 
 Let's look at it!
 
-```{r}
+```{r glimpse}
 glimpse(pbp)
 ```
 
@@ -152,7 +152,7 @@ glimpse(pbp)
 Ok, wow! We have more than 100,000 observations in our dataset, and 109 variables. These variables include play details, like down, distance, and yard line (yards_to_goal), as well as results - was it a rush or a pass? How many yards were gained? Was it a scoring play? For our initial analysis today, we'll focus on *yards gained*, *success rate*, and *expected points added*, so let's use the ```select()``` function to grab some play and team details, plus those variables. 
 
 
-```{r}
+```{r playselect}
 plays <- pbp %>% select(offense_play, defense_play, down, distance, yards_to_goal, rush, pass, yards_gained, play_text, success, EPA, garbage)
 ```
 
@@ -167,7 +167,7 @@ Summarise is the way of creating season-long or game-by-game stats. Let's start 
 
 To create a conditional mean, like "the mean of yards_gained when pass == 1", all you'll do is add the condition you want in brackets inside your mean() function.
 
-```{r}
+```{r psummary, message=FALSE,warning=FALSE}
 offense <- plays %>% group_by(offense_play) %>% 
 summarise(ypa = mean(yards_gained[pass==1]),
           ypr = mean(yards_gained[rush==1]))
@@ -176,11 +176,11 @@ summarise(ypa = mean(yards_gained[pass==1]),
 
 Now we can ask and answer some fun questions. Who had the best rushing offense, on a per play basis? Who had the best passing offense, on a per-play basis? We will do this using the arrange(desc()) function, which tells R to order the data from greatest to least (descending).
 
-```{r}
+```{r offypr}
 offense %>% arrange(desc(ypr))
 ```
 
-```{r}
+```{r offypa}
 offense %>% arrange(ypa)
 ```
 
@@ -192,14 +192,14 @@ We can easily do the defensive side of the ball as well, grouping plays instead 
 
 For the tutorial, I've included the ```head()``` function as a quick way to look at the top values of our data. In your console, though, with the ```view()``` command, you can pull up the data in a traditional spreadsheet kind of format, which can help you parse through and see what you're working with, or see results you've created.
 
-```{r,message=FALSE,warning=FALSE}
+```{r mean_pass_rush,message=FALSE,warning=FALSE}
 offense <- plays %>% group_by(offense_play) %>% 
   summarise(epa.pass.off = mean(EPA[pass==1]), epa.rush.off = mean(EPA[rush==1]))
 defense <- plays %>% group_by(defense_play) %>% 
   summarise(epa.pass.def = mean(EPA[pass==1]), epa.pass.def = mean(EPA[rush==1]))
 ```
 
-```{r,message=FALSE,warning=FALSE}
+```{r mean_team_epa,message=FALSE,warning=FALSE}
 team.epa <- left_join(offense, defense, by = c("offense_play" = "defense_play")) 
 head(team.epa)
 ```
@@ -208,17 +208,17 @@ head(team.epa)
 In analytics, we often want to break down situations. Let's use ```filter``` to select only first down plays and see which offenses performed the best on first downs only:
 
 
-```{r}
+```{r epa_rush_off, message=FALSE,warning=FALSE}
 offense <- plays %>% filter(down == 1) %>% group_by(offense_play) %>% 
   summarise(epa.pass.off = mean(EPA[pass==1]), epa.rush.off = mean(EPA[rush==1]))
 ```
 
-```{r}
+```{r epa_pass_def, message=FALSE,warning=FALSE}
 defense <- plays %>% filter(down == 1) %>% group_by(defense_play) %>% 
   summarise(epa.pass.def = mean(EPA[pass==1]), epa.pass.def = mean(EPA[rush==1]))
 ```
 
-```{r}
+```{r firstd_epa, message=FALSE,warning=FALSE}
 firstdown.epa <- left_join(offense, defense, by = c("offense_play" = "defense_play")) 
 
 head(firstdown.epa)
@@ -228,14 +228,14 @@ Easy! You can make any kind of filter you can think of, and analyse EPA or yards
 
 Lastly, let's do an example of creating some rates and using some advanced filters: We'll create success rate on early downs and early downs rush rate, filtering out garabge time. We'll use the same filter, summarise, and mean functions as above!
 
-```{r}
+```{r successrt, message=FALSE,warning=FALSE}
 success <- plays %>% filter(garbage == 0 & down < 3) %>%
   group_by(offense_play) %>% 
   summarise(success.rte = mean(success),
             rush.rte = mean(rush))
 ```
 
-```{r}
+```{r successhead,message=FALSE,warning=FALSE}
 head(success)
 ```
 
@@ -245,13 +245,13 @@ We have some pretty data, now let's learn how to make a basic ```ggplot()``` to 
 
 The syntax here is pretty simple: we will grab our dataset and use the pipe to say "open a plot". Then we'll tell the plot what the x and y coordinates are, then indicate the markers, in this case a scatterplot with geom_point(). Notice that we use + instead of %>% once we've called ggplot(). The syntax here tells R to take the `success' object and open a plot with the x.axis rush.rte and the y.axis success.rte, PLUS all these features. That can be a little confusing to keep straightforward, but R will tell you what's going on with an error if you mix that up!
 
-```{r}
+```{r successplot, message=FALSE,warning=FALSE}
 success %>% ggplot(aes(x=rush.rte, y=success.rte)) + geom_point()
 ```
 
 Ok, that's pretty cool! Let's dress it up a little bit by adding a title and labelling the axes, using the labs() option. We will also throw a couple reference lines - a vertical and horizontal line indicating the mean values of each statistic to help us compare. Plus, here are some tweaks I like that make the graph look a little better (all the theme() stuff).
 
-```{r}
+```{r successearlyrush, message=FALSE,warning=FALSE}
 success %>% ggplot(aes(x=rush.rte, y=success.rte)) + geom_point() + 
   geom_vline(xintercept = mean(success$rush.rte), linetype = "dashed", color = "red", alpha = 0.5) +
   geom_hline(yintercept = mean(success$success.rte), linetype = "dashed", color = "red", alpha = 0.5) +
@@ -271,7 +271,7 @@ If you want to get really fancy, and I know you do, you can include team logos o
 
 There are probably better/faster ways to do this, but they're all more complicated. For now, what I've done is posted the CSV from collegefootballdata.com's team page to my github, and we're just going to rip the logos from there. Not ideal, but it works. You don't need to change this line at all to get the logos data! We select school and logo because those are the only two things we need for the graphs.
 
-```{r}
+```{r cfblogos, message=FALSE,warning=FALSE}
 cfblogos <- read.csv("https://raw.githubusercontent.com/spfleming/CFB/master/logos.csv") %>% select(school, logo)
 chartdata <- success %>% left_join(cfblogos, by = c("offense_play" = "school"))
 ```
@@ -281,7 +281,7 @@ We'll make use of our graph from above, telling the plot that we want to use the
 
 It might take up to two minutes to load! Don't freak out! Don't close R! Just let it load! You'll see a white screen in your Plots window, but I promise the graph is coming.
 
-```{r}
+```{r ED_rushrt_successrt, message=FALSE,warning=FALSE}
 chartdata %>% ggplot(aes(x=rush.rte, y=success.rte)) + geom_image(image = chartdata$logo, asp = 16/9) + 
   geom_vline(xintercept = mean(chartdata$rush.rte), linetype = "dashed", color = "red", alpha = 0.5) +
   geom_hline(yintercept = mean(chartdata$success.rte), linetype = "dashed", color = "red", alpha = 0.5) +
@@ -305,7 +305,7 @@ Another useful visualization might be to see the EPA of each of a team's plays b
 
 Here's the 2019 TCU Offense:
 
-```{r}
+```{r tcu2019off, message=FALSE,warning=FALSE}
 tcu <- plays %>% filter(offense_play == "TCU") 
 
 tcu %>%
@@ -327,14 +327,14 @@ tcu %>%
 
 I added a couple fun features here: a *geom_hline()* reference line at zero, to help us better understand the graph, and a subtitle to clarify what was on the graph. Notice that TCU's EPA was spread almost evenly across the field, but you can see some serious negative ouliers that weighed them down. We could call those outliers into our console to explore them more:
 
-```{r}
+```{r tcubigneg, message=FALSE,warning=FALSE}
 plays %>% filter(offense_play == "TCU" & EPA < -4) %>% select(offense_play, defense_play, play_text, down, distance, yards_to_goal)
 ```
 
 Lastly, let's explore the ```gt()``` pacakge to list the top ten rushing and passing offenses and defenses in the country. We will take our dataset, sort it by the value we want, add a rank variable using mutate(), then apply gt(), simply enough.
 
 
-```{r}
+```{r toppasseparank,message=FALSE,warning=FALSE}
 #Passing
 team.epa %>% arrange(desc(epa.pass.off)) %>% mutate(rank = dense_rank(desc(epa.pass.off))) %>% 
   filter(rank < 10) %>% gt()
@@ -342,7 +342,7 @@ team.epa %>% arrange(desc(epa.pass.off)) %>% mutate(rank = dense_rank(desc(epa.p
 
 Now, over in your viewer (bottom right), you should see a sleek table. Ok, well, not so sleek. We will do three things to this table to make it a little more palatable. First, we'll add a title, second, we'll switch the order of the variables, and third, we will change the column titles.
 
-```{r}
+```{r teamepapass,message=FALSE,warning=FALSE}
 team.epa %>% arrange(desc(epa.pass.off)) %>% mutate(rank = dense_rank(desc(epa.pass.off))) %>%
   select(rank, offense_play, epa.pass.off) %>% 
   filter(rank < 11) %>% gt() %>%
