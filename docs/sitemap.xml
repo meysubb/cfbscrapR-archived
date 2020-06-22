@@ -22,6 +22,9 @@
     <loc>http://meysubb.github.io/cfbscrapR/reference/cfb_play_type_df.html</loc>
   </url>
   <url>
+    <loc>http://meysubb.github.io/cfbscrapR/reference/cfb_position_recruiting.html</loc>
+  </url>
+  <url>
     <loc>http://meysubb.github.io/cfbscrapR/reference/cfb_rankings.html</loc>
   </url>
   <url>
@@ -41,6 +44,9 @@
   </url>
   <url>
     <loc>http://meysubb.github.io/cfbscrapR/reference/cfb_team_talent.html</loc>
+  </url>
+  <url>
+    <loc>http://meysubb.github.io/cfbscrapR/reference/cfb_venues.html</loc>
   </url>
   <url>
     <loc>http://meysubb.github.io/cfbscrapR/reference/clean_pbp_dat.html</loc>

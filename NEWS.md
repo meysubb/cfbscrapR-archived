@@ -3,6 +3,12 @@ title: "NEWS"
 output: html_document
 ---
 
+# cfbscrapR 0.1.5
+
+- Separate Recruiting Functions (Separate function for position groups)
+- Clean up Ranking function to properly return a value
+- Create Venue Function
+
 # cfbscrapR 0.1.4
 
 Fixes include: 
