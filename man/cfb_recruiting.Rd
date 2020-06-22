@@ -2,20 +2,35 @@
 % Please edit documentation in R/cfb_recruiting.R
 \name{cfb_recruiting}
 \alias{cfb_recruiting}
-\title{Gets CFB recruiting information for a specific year (and possibly a specific team)}
+\title{Gets CFB recruiting information for a single year with filters available for team,
+recruit type, state and position.}
 \usage{
-cfb_recruiting(year, team = NULL, year2 = NULL)
+cfb_recruiting(
+  year,
+  team = NULL,
+  recruit_type = NULL,
+  state = NULL,
+  position = NULL
+)
 }
 \arguments{
-\item{year}{Year}
+\item{year}{Year (*Integer*, 4 digits YYYY, required)}
 
-\item{team}{Team information (optional)}
+\item{team}{Team information (*String* optional)}
 
-\item{year2}{Year 2 (End Year) - For position group information}
+\item{recruit_type}{default API return is 'HighSchool', other options include 'JUCO'
+or 'PrepSchool' (*String* optional) - For position group information}
+
+\item{state}{Two letter State abbreviation (*String* optional)}
+
+\item{position}{Position Group (*String* optional) - options include:
+* Offense: 'PRO', 'DUAL', 'RB', 'FB', 'TE',  'OT', 'OG', 'OC', 'WR'
+* Defense: 'CB', 'S', 'OLB', 'ILB', 'WDE', 'SDE', 'DT'
+* Special Teams: 'K', 'P'}
 }
 \description{
-If two years are provided, get cfb recruiting information based on position groups during that
-time period for all FBS teams.
+If you would like to get cfb recruiting information based on position groups during a
+time period for all FBS teams, please see `cfb_position_recruiting` function.
 }
 \examples{
 
@@ -23,6 +38,8 @@ cfb_recruiting(2018)
 
 cfb_recruiting(2018,team="Texas")
 
-cfb_recruiting(2016,year2=2018)
+cfb_recruiting(2016,recruit_type = 'JUCO')
+cfb_recruiting(2020, recruit_type = 'HighSchool', position ='OT', state = 'FL')
+
 }
 \keyword{Recruiting}
