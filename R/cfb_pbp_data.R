@@ -110,10 +110,16 @@ cfb_pbp_data <- function(year,
     )
     clean_drive_df = clean_drive_info(drive_info)
     colnames(clean_drive_df) <- paste0("drive_",colnames(clean_drive_df))
-    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(clean_drive_df,
-                                                                                by = c("drive_id"="drive_drive_id"),
-                                                                                suffix = c("_play", "_drive"))
+    play_df = play_df %>% mutate(drive_id = as.numeric(drive_id)) %>% left_join(
+      clean_drive_df,
+      by = c("drive_id" =
+               "drive_drive_id",
+             "game_id" =
+               "drive_game_id"),
+      suffix = c("_play", "_drive")
+    )
     rm_cols = c(
+      'drive_game_id',
       'drive_offense_conference',
       'drive_defense_conference',
       'drive_offense',
@@ -135,8 +141,7 @@ cfb_pbp_data <- function(year,
     play_df = play_df %>%
       select(
         setdiff(names(.), rm_cols)
-      ) %>% rename(game_id=drive_game_id,
-                   drive_pts = drive_pts_drive,
+      ) %>% rename(drive_pts = drive_pts_drive,
                    drive_result = drive_drive_result,
                    id_play=id,
                    offense_play=offense,

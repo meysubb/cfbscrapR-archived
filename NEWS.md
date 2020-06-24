@@ -3,6 +3,10 @@ title: "NEWS"
 output: html_document
 ---
 
+# cfbscrapR 0.1.6
+
+- Bug fix on pbp function
+
 # cfbscrapR 0.1.5
 
 - Separate Recruiting Functions (Separate function for position groups)
