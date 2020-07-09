@@ -1,3 +1,8 @@
+This repo has been archived. You can find the latet version of the package at:
+
+- github.com/meysubb/cfbscrapR
+- github.com/saiemgilani/cfbscrapR
+
 # cfbscrapR
 
 `cfbscrapR` is an R package for working with CFB data. It is an R API wrapper around https://collegefootballdata.com/. It provides users the capability to get a plethora of endpoints, and supplement that data with additional information (Expected Points Added/Win Probability added). [Documentation Page](https://meysubb.github.io/cfbscrapR/ "cfbscrapR Documentation Page")
