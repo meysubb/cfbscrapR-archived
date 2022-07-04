@@ -1,7 +1,6 @@
 This repo has been archived. You can find the latet version of the package at:
 
-- github.com/meysubb/cfbscrapR
-- github.com/saiemgilani/cfbscrapR
+- https://github.com/sportsdataverse/cfbfastR  
 
 # cfbscrapR
 
